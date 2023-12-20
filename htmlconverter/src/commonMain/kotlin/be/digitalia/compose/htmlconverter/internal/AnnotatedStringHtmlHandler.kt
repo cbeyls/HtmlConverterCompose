@@ -32,7 +32,8 @@ import be.digitalia.compose.htmlconverter.HtmlHandler
 
 internal class AnnotatedStringHtmlHandler(
     private val builder: AnnotatedString.Builder,
-    private val compactMode: Boolean
+    private val compactMode: Boolean,
+    private val urlSpanStyle: SpanStyle
 ) : HtmlHandler {
     private val textWriter = HtmlTextWriter(builder)
     private var listLevel = 0
@@ -133,7 +134,7 @@ internal class AnnotatedStringHtmlHandler(
     @OptIn(ExperimentalTextApi::class)
     private fun handleAnchorStart(url: String) {
         builder.pushUrlAnnotation(UrlAnnotation(url))
-        handleSpanStyleStart(SpanStyle(textDecoration = TextDecoration.Underline))
+        handleSpanStyleStart(urlSpanStyle)
     }
 
     private fun handleHeadingStart(name: String) {

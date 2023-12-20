@@ -18,6 +18,8 @@
 package be.digitalia.compose.htmlconverter
 
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.style.TextDecoration
 import be.digitalia.compose.htmlconverter.internal.AnnotatedStringHtmlHandler
 import be.digitalia.compose.htmlconverter.internal.StringHtmlHandler
 import be.digitalia.compose.htmlconverter.internal.parser.KtXmlParser
@@ -25,8 +27,12 @@ import be.digitalia.compose.htmlconverter.internal.parser.KtXmlParser
 /**
  * Convert HTML to AnnotatedString using the built-in parser.
  */
-public fun htmlToAnnotatedString(html: String, compactMode: Boolean = false): AnnotatedString {
-    return htmlToAnnotatedString(KtXmlParser(html.iterator()), compactMode)
+public fun htmlToAnnotatedString(
+    html: String,
+    compactMode: Boolean = false,
+    urlSpanStyle: SpanStyle = SpanStyle(textDecoration = TextDecoration.Underline)
+): AnnotatedString {
+    return htmlToAnnotatedString(KtXmlParser(html.iterator()), compactMode, urlSpanStyle)
 }
 
 /**
@@ -34,10 +40,11 @@ public fun htmlToAnnotatedString(html: String, compactMode: Boolean = false): An
  */
 public fun htmlToAnnotatedString(
     parser: HtmlParser,
-    compactMode: Boolean = false
+    compactMode: Boolean = false,
+    urlSpanStyle: SpanStyle = SpanStyle(textDecoration = TextDecoration.Underline)
 ): AnnotatedString {
     val builder = AnnotatedString.Builder()
-    parser.parse(AnnotatedStringHtmlHandler(builder, compactMode))
+    parser.parse(AnnotatedStringHtmlHandler(builder, compactMode, urlSpanStyle))
     return builder.toAnnotatedString()
 }
 
