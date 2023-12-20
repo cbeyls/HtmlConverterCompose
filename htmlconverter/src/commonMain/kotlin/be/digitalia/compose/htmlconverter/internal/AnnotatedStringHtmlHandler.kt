@@ -28,6 +28,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
 import be.digitalia.compose.htmlconverter.HtmlHandler
 
 internal class AnnotatedStringHtmlHandler(
@@ -244,6 +245,7 @@ internal class AnnotatedStringHtmlHandler(
 
     companion object {
         private val HEADING_SIZES = floatArrayOf(1.5f, 1.4f, 1.3f, 1.2f, 1.1f, 1f)
-        private val INDENT_UNIT: TextUnit = 2.em
+        // Compose Desktop does not support em unit for indents yet
+        private val INDENT_UNIT: TextUnit = 24.sp
     }
 }
