@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "HtmlConverterCompose"
 include(":htmlconverter")
+include(":sample")
