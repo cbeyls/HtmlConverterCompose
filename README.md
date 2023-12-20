@@ -45,8 +45,9 @@ sourceSets {
 To display styled HTML in a Text composable:
 
 ```kotlin
+val annotatedString = remember { htmlToAnnotatedString(html) }
 Text(
-    text = htmlToAnnotatedString(html),
+    text = annotatedString,
     modifier = Modifier.fillMaxWidth()
 )
 ```
@@ -66,7 +67,7 @@ Hyperlinks (inside the `a` tags) will be underlined and annotated with the exper
 For example, the `ClickableText` composable can be used, even if that solution is not perfect because it captures all touch events:
 
 ```kotlin
-val annotatedString = htmlToAnnotatedString(html)
+val annotatedString = remember { htmlToAnnotatedString(html) }
 ClickableText(
     text = annotatedString,
     modifier = Modifier.fillMaxWidth(),
