@@ -45,10 +45,6 @@ android {
     namespace = "be.digitalia.compose.htmlconverter.sample"
     compileSdk = 34
 
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    sourceSets["main"].res.srcDirs("src/androidMain/res")
-    sourceSets["main"].resources.srcDirs("src/commonMain/resources")
-
     defaultConfig {
         applicationId = "be.digitalia.compose.htmlconverter.sample"
         minSdk = 21
@@ -56,14 +52,20 @@ android {
         versionCode = 1
         versionName = "1.0.0"
     }
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+        }
+        packaging {
+            resources {
+                excludes += listOf(
+                    "DebugProbesKt.bin",
+                    "kotlin-tooling-metadata.json",
+                    "kotlin/**",
+                    "META-INF/*.version"
+                )
+            }
         }
     }
     compileOptions {

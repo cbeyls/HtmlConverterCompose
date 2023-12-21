@@ -4,7 +4,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 
 fun main() = application {
-    Window(onCloseRequest = ::exitApplication, title = "HTMLConverter Sample") {
+    Window(onCloseRequest = ::exitApplication, title = "HTML Converter for Compose Sample") {
         App()
     }
 }
