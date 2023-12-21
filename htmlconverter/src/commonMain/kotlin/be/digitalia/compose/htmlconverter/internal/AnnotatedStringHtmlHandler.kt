@@ -38,6 +38,7 @@ internal class AnnotatedStringHtmlHandler(
     private val textWriter = HtmlTextWriter(builder)
     private var listLevel = 0
     private var preformattedLevel = 0
+    private var boldLevel = 0
     private var skippedTagsLevel = 0
     private var blockStartIndex = -1
     private var blockIndentLevel = 0
@@ -55,7 +56,7 @@ internal class AnnotatedStringHtmlHandler(
             "dt" -> handleDefinitionTermStart()
             "dd" -> handleDefinitionDetailStart()
             "pre" -> handlePreStart()
-            "strong", "b" -> handleSpanStyleStart(SpanStyle(fontWeight = FontWeight.Bold))
+            "strong", "b" -> handleBoldStart()
             "em", "cite", "dfn", "i" -> handleSpanStyleStart(SpanStyle(fontStyle = FontStyle.Italic))
             "big" -> handleSpanStyleStart(SpanStyle(fontSize = 1.25.em))
             "small" -> handleSpanStyleStart(SpanStyle(fontSize = 0.8.em))
@@ -127,6 +128,15 @@ internal class AnnotatedStringHtmlHandler(
         preformattedLevel++
     }
 
+    private fun incrementBoldLevel(): FontWeight {
+        boldLevel++
+        return if (boldLevel == 1) FontWeight.Bold else FontWeight.Black
+    }
+
+    private fun handleBoldStart() {
+        handleSpanStyleStart(SpanStyle(fontWeight = incrementBoldLevel()))
+    }
+
     private fun handleSpanStyleStart(style: SpanStyle) {
         builder.pushStyle(style)
     }
@@ -140,7 +150,12 @@ internal class AnnotatedStringHtmlHandler(
     private fun handleHeadingStart(name: String) {
         handleBlockStart(2, false)
         val level = name[1].digitToInt()
-        handleSpanStyleStart(SpanStyle(fontSize = HEADING_SIZES[level - 1].em))
+        handleSpanStyleStart(
+            SpanStyle(
+                fontSize = HEADING_SIZES[level - 1].em,
+                fontWeight = incrementBoldLevel()
+            )
+        )
     }
 
     private fun handleSkippedTagStart() {
@@ -160,7 +175,7 @@ internal class AnnotatedStringHtmlHandler(
             "dt" -> handleDefinitionTermEnd()
             "dd" -> handleDefinitionDetailEnd()
             "pre" -> handlePreEnd()
-            "strong", "b",
+            "strong", "b" -> handleBoldEnd()
             "em", "cite", "dfn", "i",
             "big",
             "small",
@@ -212,6 +227,15 @@ internal class AnnotatedStringHtmlHandler(
         handleBlockEnd(2, false)
     }
 
+    private fun decrementBoldLevel() {
+        boldLevel--
+    }
+
+    private fun handleBoldEnd() {
+        handleSpanStyleEnd()
+        decrementBoldLevel()
+    }
+
     private fun handleSpanStyleEnd() {
         builder.pop()
     }
@@ -223,6 +247,7 @@ internal class AnnotatedStringHtmlHandler(
 
     private fun handleHeadingEnd() {
         handleSpanStyleEnd()
+        decrementBoldLevel()
         handleBlockEnd(1, false)
     }
 
