@@ -4,7 +4,7 @@ class SampleHtml {
     fun get(): String {
         return """
             <h1>Hello <strong>HTML Converter</strong> for Compose</h1>
-            <p>This the first paragraph of the sample app running on <strong>${platform.name}</strong!</p>
+            <p>This the first paragraph of the sample app running on <strong>${platform.name}</strong>!</p>
             <ul>
                 <li><strong>Bold</strong></li>
                 <li><em>Italic</em></li>
