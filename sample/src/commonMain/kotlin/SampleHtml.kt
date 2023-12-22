@@ -14,11 +14,11 @@ class SampleHtml {
                 <li><a href="#">Hyperlink with custom styling</a> (non-clickable in this sample)</li>
                 <li><big>Bigger</big> and <small>smaller</small> text</li>
                 <li><sup>Super</sup>text and <sub>sub</sub>text</li>
-                <li>A nested list:
-                    <ul>
+                <li>A nested ordered list:
+                    <ol>
                         <li>Item 1</li>
                         <li>Item 2</li>
-                    </ul>
+                    </ol>
                 </li>
             </ul>
 

@@ -37,6 +37,8 @@ internal class AnnotatedStringHtmlHandler(
 ) : HtmlHandler {
     private val textWriter = HtmlTextWriter(builder)
     private var listLevel = 0
+    // A negative index means the list is unordered
+    private var listIndexes: IntArray = EMPTY_LIST_INDEXES
     private var preformattedLevel = 0
     private var boldLevel = 0
     private var skippedTagsLevel = 0
@@ -51,7 +53,8 @@ internal class AnnotatedStringHtmlHandler(
             "div", "header", "footer", "main", "nav", "aside", "section", "article",
             "address", "figure", "figcaption",
             "video", "audio" -> handleBlockStart(1, false)
-            "ul", "ol", "dl" -> handleListStart()
+            "ul", "dl" -> handleListStart(-1)
+            "ol" -> handleListStart(1)
             "li" -> handleListItemStart()
             "dt" -> handleDefinitionTermStart()
             "dd" -> handleDefinitionDetailStart()
@@ -104,14 +107,37 @@ internal class AnnotatedStringHtmlHandler(
         textWriter.startBlock(if (compactMode) 0 else prefixNewLineCount - 1, 0)
     }
 
-    private fun handleListStart() {
-        handleBlockStart(if (listLevel == 0) 2 else 1, false)
-        listLevel++
+    private fun handleListStart(initialIndex: Int) {
+        val currentListLevel = listLevel
+        handleBlockStart(if (currentListLevel == 0) 2 else 1, false)
+        val listIndexesSize = listIndexes.size
+        // Ensure listIndexes capacity
+        if (currentListLevel == listIndexesSize) {
+            listIndexes = if (listIndexesSize == 0) {
+                IntArray(INITIAL_LIST_INDEXES_SIZE)
+            } else {
+                listIndexes.copyOf(listIndexesSize * 2)
+            }
+        }
+        listIndexes[currentListLevel] = initialIndex
+        listLevel = currentListLevel + 1
     }
 
     private fun handleListItemStart() {
-        handleBlockStart(1, listLevel > 1)
-        textWriter.write("• ")
+        val currentListLevel = listLevel
+        handleBlockStart(1, currentListLevel > 1)
+        val itemIndex = if (currentListLevel == 0) {
+            -1
+        } else {
+            listIndexes[currentListLevel - 1]
+        }
+        if (itemIndex < 0) {
+            textWriter.write("• ")
+        } else {
+            textWriter.write(itemIndex.toString())
+            textWriter.write(". ")
+            listIndexes[currentListLevel - 1] = itemIndex + 1
+        }
     }
 
     private fun handleDefinitionTermStart() {
@@ -172,7 +198,8 @@ internal class AnnotatedStringHtmlHandler(
             "div", "header", "footer", "main", "nav", "aside", "section", "article",
             "address", "figure", "figcaption",
             "video", "audio" -> handleBlockEnd(1, false)
-            "ul", "ol", "dl" -> handleListEnd()
+            "ul", "dl",
+            "ol" -> handleListEnd()
             "li" -> handleListItemEnd()
             "dt" -> handleDefinitionTermEnd()
             "dd" -> handleDefinitionDetailEnd()
@@ -274,5 +301,7 @@ internal class AnnotatedStringHtmlHandler(
 
     companion object {
         private val HEADING_SIZES = floatArrayOf(1.5f, 1.4f, 1.3f, 1.2f, 1.1f, 1f)
+        private val EMPTY_LIST_INDEXES = intArrayOf()
+        private const val INITIAL_LIST_INDEXES_SIZE = 8
     }
 }

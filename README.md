@@ -115,7 +115,7 @@ The default implementation uses the [KtXml](https://github.com/kobjects/ktxml) m
 
 - Inline tags with styling: `strong`, `b` (**bold**), `em`, `cite`, `dfn`, `i` (*italic*), `big` (bigger text), `small` (smaller text), `tt`, `code` (`monospace font`), `a` ([hyperlink](#supported-html-tags)), `u` (underline), `del`, `s`, `strike` (~~strikethrough~~), `sup` (<sup>supertext</sup>), `sub` (<sub>subtext</sub>)
 - Block tags (paragraphs): `p`, `blockquote`, `pre` (including `monospace font`), `div`, `header`, `footer`, `main`, `nav`, `aside`, `section`, `article`, `address`, `figure`, `figcaption`, `video`, `audio` (no player shown, only inline text)
-- Lists: `ul`, `ol` (entries are currently unnumbered, similar to `ul`), `li`, `dl`, `dt`, `dd`
+- Lists: `ul`, `ol`, `li`, `dl`, `dt`, `dd`
 - Section headings: `h1`, `h2`, `h3`, `h4`, `h5`, `h6`
 - Line break: `br`
 
@@ -133,7 +133,6 @@ All HTML entities appearing in the text will be properly decoded as well.
 ## What to expect from future versions
 
 - Unit tests
-- Proper support for ordered lists
 - Better clickable hyperlinks support
 - Support for displaying images as inline content
 - iOS support (with help from the community).
