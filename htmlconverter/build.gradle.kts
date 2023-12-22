@@ -16,6 +16,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                implementation(compose.runtime)
                 implementation(compose.ui)
                 implementation("org.kobjects.ktxml:core:0.2.3")
             }

@@ -25,8 +25,12 @@ import be.digitalia.compose.htmlconverter.internal.parser.KtXmlParser
 /**
  * Convert HTML to AnnotatedString using the built-in parser.
  */
-public fun htmlToAnnotatedString(html: String, compactMode: Boolean = false): AnnotatedString {
-    return htmlToAnnotatedString(KtXmlParser(html.iterator()), compactMode)
+public fun htmlToAnnotatedString(
+    html: String,
+    compactMode: Boolean = false,
+    style: HtmlStyle = HtmlStyle.DEFAULT
+): AnnotatedString {
+    return htmlToAnnotatedString(KtXmlParser(html.iterator()), compactMode, style)
 }
 
 /**
@@ -34,10 +38,11 @@ public fun htmlToAnnotatedString(html: String, compactMode: Boolean = false): An
  */
 public fun htmlToAnnotatedString(
     parser: HtmlParser,
-    compactMode: Boolean = false
+    compactMode: Boolean = false,
+    style: HtmlStyle = HtmlStyle.DEFAULT
 ): AnnotatedString {
     val builder = AnnotatedString.Builder()
-    parser.parse(AnnotatedStringHtmlHandler(builder, compactMode))
+    parser.parse(AnnotatedStringHtmlHandler(builder, compactMode, style))
     return builder.toAnnotatedString()
 }
 

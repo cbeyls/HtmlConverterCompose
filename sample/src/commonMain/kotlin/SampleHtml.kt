@@ -11,7 +11,7 @@ class SampleHtml {
                 <li><u>Underline</u></li>
                 <li><del>Strikethrough</del></li>
                 <li><code>Code</code></li>
-                <li><a href="#">Hyperlink</a> (non-clickable in this sample)</li>
+                <li><a href="#">Hyperlink with custom styling</a> (non-clickable in this sample)</li>
                 <li><big>Bigger</big> and <small>smaller</small> text</li>
                 <li><sup>Super</sup>text and <sub>sub</sub>text</li>
                 <li>A nested list:

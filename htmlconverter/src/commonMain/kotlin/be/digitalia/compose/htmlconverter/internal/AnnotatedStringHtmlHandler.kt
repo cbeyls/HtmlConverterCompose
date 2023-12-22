@@ -26,14 +26,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextIndent
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.em
-import androidx.compose.ui.unit.sp
 import be.digitalia.compose.htmlconverter.HtmlHandler
+import be.digitalia.compose.htmlconverter.HtmlStyle
 
 internal class AnnotatedStringHtmlHandler(
     private val builder: AnnotatedString.Builder,
-    private val compactMode: Boolean
+    private val compactMode: Boolean,
+    private val style: HtmlStyle
 ) : HtmlHandler {
     private val textWriter = HtmlTextWriter(builder)
     private var listLevel = 0
@@ -79,7 +79,7 @@ internal class AnnotatedStringHtmlHandler(
         // Close current paragraph, if any
         blockStartIndex.let { startIndex ->
             if (startIndex in 0..<currentIndex) {
-                val indentSize = INDENT_UNIT * blockIndentLevel
+                val indentSize = style.indentUnit * blockIndentLevel
                 builder.addStyle(
                     style = ParagraphStyle(
                         textIndent = TextIndent(
@@ -144,7 +144,9 @@ internal class AnnotatedStringHtmlHandler(
     @OptIn(ExperimentalTextApi::class)
     private fun handleAnchorStart(url: String) {
         builder.pushUrlAnnotation(UrlAnnotation(url))
-        handleSpanStyleStart(SpanStyle(textDecoration = TextDecoration.Underline))
+        style.linkSpanStyle?.let {
+            handleSpanStyleStart(it)
+        }
     }
 
     private fun handleHeadingStart(name: String) {
@@ -241,7 +243,9 @@ internal class AnnotatedStringHtmlHandler(
     }
 
     private fun handleAnchorEnd() {
-        handleSpanStyleEnd()
+        if (style.linkSpanStyle != null) {
+            handleSpanStyleEnd()
+        }
         builder.pop()
     }
 
@@ -270,7 +274,5 @@ internal class AnnotatedStringHtmlHandler(
 
     companion object {
         private val HEADING_SIZES = floatArrayOf(1.5f, 1.4f, 1.3f, 1.2f, 1.1f, 1f)
-        // Compose Desktop does not support em unit for indents yet
-        private val INDENT_UNIT: TextUnit = 24.sp
     }
 }

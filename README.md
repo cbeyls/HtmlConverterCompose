@@ -45,12 +45,13 @@ sourceSets {
 To display styled HTML in a Text composable:
 
 ```kotlin
-val annotatedString = remember { htmlToAnnotatedString(html) }
 Text(
-    text = annotatedString,
+    text = remember(html) { htmlToAnnotatedString(html) },
     modifier = Modifier.fillMaxWidth()
 )
 ```
+
+> If called from inside a `@Composable` function, in most cases it is recommended to use `remember()` to cache the result of the conversion, to avoid recomputation on each recomposition.
 
 To convert HTML to unstyled text:
 
@@ -60,19 +61,42 @@ val rawText = htmlToString(html)
 
 Both functions take an optional `compactMode` boolean argument. When set to `true`, all paragraphs will be separated by a single line break instead of two, as it is normally the case for the tags: `p`, `blockquote`, `pre`, `ul`, `ol`, `dl`, `h1`, `h2`, `h3`, `h4`, `h5`, `h6`. The default value is `false`.
 
+### Custom styling
+
+The `htmlToAnnotatedString()` function takes an optional `style` argument of type `HtmlStyle` which allows to customize styling. The currently provided options are:
+
+- `linkSpanStyle`: Optional style for hyperlinks (content of `a` tags). Default is a simple underline. When set to `null`, hyperlinks will not be styled, which can be useful in case they are not clickable (see next section).
+- `indentUnit`: Unit of indentation for block quotations and nested lists. Default is **24 sp**. Note that `em` units are not yet supported for indentation in Compose Desktop.
+
+For example, here is how to style hyperlinks to use the theme's primary color with no underline:
+
+```kotlin
+val linkColor = MaterialTheme.colors.primary
+val convertedText = remember(html, linkColor) {
+    htmlToAnnotatedString(
+        html,
+        style = HtmlStyle(linkSpanStyle = SpanStyle(color = linkColor))
+    )
+}
+Text(
+    text = convertedText,
+    modifier = Modifier.fillMaxWidth()
+)
+```
+
 ### Handling hyperlink clicks
 
-Hyperlinks (inside the `a` tags) will be underlined and annotated with the experimental [`UrlAnnotation`](https://developer.android.com/reference/kotlin/androidx/compose/ui/text/UrlAnnotation). It is required to add custom code to detect clicks on these annotations and handle the navigation action accordingly.
+Hyperlinks (content of `a` tags) will be annotated with the experimental [`UrlAnnotation`](https://developer.android.com/reference/kotlin/androidx/compose/ui/text/UrlAnnotation). It is required to add custom code to detect clicks on these annotations and handle the navigation action accordingly.
 
 For example, the `ClickableText` composable can be used, even if that solution is not perfect because it captures all touch events:
 
 ```kotlin
-val annotatedString = remember { htmlToAnnotatedString(html) }
+val convertedText = remember(html) { htmlToAnnotatedString(html) }
 ClickableText(
-    text = annotatedString,
+    text = convertedText,
     modifier = Modifier.fillMaxWidth(),
     onClick = { position ->
-        annotatedString
+        convertedText
             .getUrlAnnotations(position, position)
             .firstOrNull()?.let { range -> onLinkClick(range.item.url) }
     }
