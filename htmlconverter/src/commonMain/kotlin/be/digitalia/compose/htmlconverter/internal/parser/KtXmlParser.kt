@@ -34,18 +34,35 @@ internal class KtXmlParser(private val html: CharIterator) : HtmlParser {
         while (true) {
             when (parser.next()) {
                 EventType.START_TAG -> {
-                    val lowerCaseName = parser.name.lowercase()
-                    tagStack.add(lowerCaseName)
-                    handler.onOpenTag(lowerCaseName, attributes)
+                    val name = parser.name
+                    if (name.equals(BR_TAG_NAME, ignoreCase = true)) {
+                        // Special case for BR tag which is always immediately auto-closed
+                        handler.onOpenTag(BR_TAG_NAME, attributes)
+                        handler.onCloseTag(BR_TAG_NAME)
+                        if (parser.isEmptyElementTag) {
+                            parser.next()
+                        }
+                    } else {
+                        val lowerCaseName = name.lowercase()
+                        tagStack.add(lowerCaseName)
+                        handler.onOpenTag(lowerCaseName, attributes)
+                    }
                 }
 
                 EventType.END_TAG -> {
                     val name = parser.name
-                    val stackPosition = tagStack.indexOfLast { it.equals(name, ignoreCase = true) }
-                    if (stackPosition != -1) {
-                        // Also close all unclosed child tags, if any
-                        for (i in tagStack.lastIndex downTo stackPosition) {
-                            handler.onCloseTag(tagStack.removeAt(i))
+                    if (name.equals(BR_TAG_NAME, ignoreCase = true)) {
+                        // A closing BR tag is interpreted as a self-closing BR tag
+                        handler.onOpenTag(BR_TAG_NAME, EMPTY_ATTRIBUTES)
+                        handler.onCloseTag(BR_TAG_NAME)
+                    } else {
+                        val stackPosition =
+                            tagStack.indexOfLast { it.equals(name, ignoreCase = true) }
+                        if (stackPosition != -1) {
+                            // Also close all unclosed child tags, if any
+                            for (i in tagStack.lastIndex downTo stackPosition) {
+                                handler.onCloseTag(tagStack.removeAt(i))
+                            }
                         }
                     }
                 }
@@ -60,5 +77,10 @@ internal class KtXmlParser(private val html: CharIterator) : HtmlParser {
         for (i in tagStack.lastIndex downTo 0) {
             handler.onCloseTag(tagStack[i])
         }
+    }
+
+    companion object {
+        private const val BR_TAG_NAME = "br"
+        private val EMPTY_ATTRIBUTES: (String) -> String? = { null }
     }
 }

@@ -47,7 +47,7 @@ internal class AnnotatedStringHtmlHandler(
 
     override fun onOpenTag(name: String, attributes: (String) -> String?) {
         when (name) {
-            "br" -> {}
+            "br" -> handleLineBreakStart()
             "p" -> handleBlockStart(2, false)
             "blockquote" -> handleBlockStart(2, true)
             "div", "header", "footer", "main", "nav", "aside", "section", "article",
@@ -72,6 +72,10 @@ internal class AnnotatedStringHtmlHandler(
             "h1", "h2", "h3", "h4", "h5", "h6" -> handleHeadingStart(name)
             "script", "head", "table", "form", "fieldset" -> handleSkippedTagStart()
         }
+    }
+
+    private fun handleLineBreakStart() {
+        textWriter.writeLineBreak()
     }
 
     /**
@@ -192,7 +196,7 @@ internal class AnnotatedStringHtmlHandler(
 
     override fun onCloseTag(name: String) {
         when (name) {
-            "br" -> handleLineBreakEnd()
+            "br" -> {}
             "p" -> handleBlockEnd(2, false)
             "blockquote" -> handleBlockEnd(2, true)
             "div", "header", "footer", "main", "nav", "aside", "section", "article",
@@ -217,10 +221,6 @@ internal class AnnotatedStringHtmlHandler(
             "h1", "h2", "h3", "h4", "h5", "h6" -> handleHeadingEnd()
             "script", "head", "table", "form", "fieldset" -> handleSkippedTagEnd()
         }
-    }
-
-    private fun handleLineBreakEnd() {
-        textWriter.writeLineBreak()
     }
 
     private fun handleBlockEnd(suffixNewLineCount: Int, indent: Boolean) {

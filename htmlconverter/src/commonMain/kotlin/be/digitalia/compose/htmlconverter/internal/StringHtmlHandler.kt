@@ -33,7 +33,7 @@ internal class StringHtmlHandler(
 
     override fun onOpenTag(name: String, attributes: (String) -> String?) {
         when (name) {
-            "br" -> {}
+            "br" -> handleLineBreakStart()
             "p", "blockquote" -> handleBlockStart(2, 0)
             "div", "header", "footer", "main", "nav", "aside", "section", "article",
             "address", "figure", "figcaption",
@@ -47,6 +47,10 @@ internal class StringHtmlHandler(
             "h1", "h2", "h3", "h4", "h5", "h6" -> handleHeadingStart()
             "script", "head", "table", "form", "fieldset" -> handleSkippedTagStart()
         }
+    }
+
+    private fun handleLineBreakStart() {
+        textWriter.writeLineBreak()
     }
 
     private fun handleBlockStart(prefixNewLineCount: Int, indentCount: Int) {
@@ -109,7 +113,7 @@ internal class StringHtmlHandler(
 
     override fun onCloseTag(name: String) {
         when (name) {
-            "br" -> handleLineBreakEnd()
+            "br" -> {}
             "p", "blockquote" -> handleBlockEnd(2)
             "div", "header", "footer", "main", "nav", "aside", "section", "article",
             "address", "figure", "figcaption",
@@ -123,10 +127,6 @@ internal class StringHtmlHandler(
             "h1", "h2", "h3", "h4", "h5", "h6" -> handleHeadingEnd()
             "script", "head", "table", "form", "fieldset" -> handleSkippedTagEnd()
         }
-    }
-
-    private fun handleLineBreakEnd() {
-        textWriter.writeLineBreak()
     }
 
     private fun handleBlockEnd(suffixNewLineCount: Int) {
