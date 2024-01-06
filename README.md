@@ -121,7 +121,7 @@ The default implementation uses the [KtXml](https://github.com/kobjects/ktxml) m
 
 The following tags are skipped, along with their content: `script`, `head`, `table`, `form`, `fieldset`.
 
-Others tags are ignored and replaced by their content, if any. For example, an `img` tag with inline replacement text will show the replacement text.
+Others tags are ignored and replaced by their content, if any.
 
 All HTML entities appearing in the text will be properly decoded as well.
 

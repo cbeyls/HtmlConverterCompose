@@ -34,27 +34,25 @@ internal class KtXmlParser(private val html: CharIterator) : HtmlParser {
         while (true) {
             when (parser.next()) {
                 EventType.START_TAG -> {
-                    val name = parser.name
-                    if (name.equals(BR_TAG_NAME, ignoreCase = true)) {
-                        // Special case for BR tag which is always immediately auto-closed
-                        handler.onOpenTag(BR_TAG_NAME, attributes)
-                        handler.onCloseTag(BR_TAG_NAME)
+                    val lowerCaseName = parser.name.lowercase()
+                    handler.onOpenTag(lowerCaseName, attributes)
+                    if (lowerCaseName == "br" || lowerCaseName == "hr" || lowerCaseName == "img") {
+                        // Special case for unpaired tags: closing event is notified immediately
+                        handler.onCloseTag(lowerCaseName)
                         if (parser.isEmptyElementTag) {
                             parser.next()
                         }
                     } else {
-                        val lowerCaseName = name.lowercase()
                         tagStack.add(lowerCaseName)
-                        handler.onOpenTag(lowerCaseName, attributes)
                     }
                 }
 
                 EventType.END_TAG -> {
                     val name = parser.name
-                    if (name.equals(BR_TAG_NAME, ignoreCase = true)) {
+                    if (name.equals("br", ignoreCase = true)) {
                         // A closing BR tag is interpreted as a self-closing BR tag
-                        handler.onOpenTag(BR_TAG_NAME, EMPTY_ATTRIBUTES)
-                        handler.onCloseTag(BR_TAG_NAME)
+                        handler.onOpenTag("br", EMPTY_ATTRIBUTES)
+                        handler.onCloseTag("br")
                     } else {
                         val stackPosition =
                             tagStack.indexOfLast { it.equals(name, ignoreCase = true) }
@@ -80,7 +78,6 @@ internal class KtXmlParser(private val html: CharIterator) : HtmlParser {
     }
 
     companion object {
-        private const val BR_TAG_NAME = "br"
         private val EMPTY_ATTRIBUTES: (String) -> String? = { null }
     }
 }
