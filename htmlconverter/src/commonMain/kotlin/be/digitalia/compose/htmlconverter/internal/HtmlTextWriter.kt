@@ -22,23 +22,13 @@ internal class HtmlTextWriter(private val output: Appendable) {
     private var pendingIndentCount = 0
     private var hasTrailingNewLine = false
 
-    fun startBlock(prefixNewLineCount: Int, indentCount: Int) {
+    fun markBlockTransition(newLineCount: Int, indentCount: Int) {
         pendingNewLineCount.let {
             if (it >= 0) {
-                pendingNewLineCount = maxOf(it, prefixNewLineCount)
+                pendingNewLineCount = maxOf(it, newLineCount)
             }
         }
         pendingIndentCount = indentCount
-        currentState = STATE_BEGIN_TEXT
-    }
-
-    fun endBlock(suffixNewLineCount: Int) {
-        pendingNewLineCount.let {
-            if (it >= 0) {
-                pendingNewLineCount = maxOf(it, suffixNewLineCount)
-            }
-        }
-        pendingIndentCount = 0
         currentState = STATE_BEGIN_TEXT
     }
 
