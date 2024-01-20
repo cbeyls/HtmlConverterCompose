@@ -54,7 +54,7 @@ internal class StringHtmlHandler(
     }
 
     private fun handleBlockStart(prefixNewLineCount: Int, indentCount: Int) {
-        textWriter.markBlockTransition(if (compactMode) 1 else prefixNewLineCount, indentCount)
+        textWriter.markBlockBoundary(if (compactMode) 1 else prefixNewLineCount, indentCount)
     }
 
     private fun handleListStart(initialIndex: Int) {
@@ -130,7 +130,7 @@ internal class StringHtmlHandler(
     }
 
     private fun handleBlockEnd(suffixNewLineCount: Int) {
-        textWriter.markBlockTransition(if (compactMode) 1 else suffixNewLineCount, 0)
+        textWriter.markBlockBoundary(if (compactMode) 1 else suffixNewLineCount, 0)
     }
 
     private fun handleListEnd() {

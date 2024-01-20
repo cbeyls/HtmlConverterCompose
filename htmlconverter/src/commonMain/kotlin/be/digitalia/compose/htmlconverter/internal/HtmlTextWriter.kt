@@ -19,17 +19,32 @@ internal class HtmlTextWriter(private val output: Appendable) {
     private var currentState = STATE_BEGIN_TEXT
     // A negative value indicates new lines should be skipped for the next paragraph
     private var pendingNewLineCount = -1
+    private var hasParagraphStyle = false
     private var pendingIndentCount = 0
-    private var hasTrailingNewLine = false
 
-    fun markBlockTransition(newLineCount: Int, indentCount: Int) {
-        pendingNewLineCount.let {
-            if (it >= 0) {
-                pendingNewLineCount = maxOf(it, newLineCount)
-            }
+    /**
+     * @return the updated pending new line count.
+     */
+    fun markBlockBoundary(newLineCount: Int, indentCount: Int): Int {
+        require(newLineCount > 0) { "newLineCount must be positive" }
+        var currentNewLineCount = pendingNewLineCount
+        if (currentNewLineCount >= 0) {
+            currentNewLineCount = maxOf(currentNewLineCount, newLineCount)
+            pendingNewLineCount = currentNewLineCount
         }
         pendingIndentCount = indentCount
         currentState = STATE_BEGIN_TEXT
+        return currentNewLineCount
+    }
+
+    /**
+     * Same as markBlockBoundary() with an indentCount of 0
+     * and omitting a single new line at the end because ParagraphStyle adds one.
+     */
+    fun markParagraphStyleBoundary(newLineCount: Int) {
+        if (markBlockBoundary(newLineCount, 0) > 0) {
+            hasParagraphStyle = true
+        }
     }
 
     /**
@@ -41,11 +56,13 @@ internal class HtmlTextWriter(private val output: Appendable) {
         }
 
         var state = currentState
+        var contentStart = true
         var index = 0
         while (true) {
             val contentStartIndex = text.indexOfFirst(index) { !it.isWhitespace() }
             // Add a single space after content if at least one leading whitespace is detected
             if (state == STATE_CONTENT_IN_PROGRESS && contentStartIndex != index) {
+                contentStart = false
                 output.append(' ')
             }
             if (contentStartIndex == -1) {
@@ -53,7 +70,10 @@ internal class HtmlTextWriter(private val output: Appendable) {
                 currentState = STATE_SPACE_IN_PROGRESS
                 break
             }
-            writePendingNewLines(false)
+            if (contentStart) {
+                writePendingNewLines(0)
+                contentStart = false
+            }
 
             index = text.indexOfFirst(contentStartIndex + 1) { it.isWhitespace() }
             if (index == -1) {
@@ -71,16 +91,15 @@ internal class HtmlTextWriter(private val output: Appendable) {
 
     fun writePreformatted(text: String) {
         if (text.isNotEmpty()) {
-            writePendingNewLines(false)
+            writePendingNewLines(0)
             output.append(text)
+            currentState = STATE_BEGIN_TEXT
         }
     }
 
     fun writeLineBreak() {
-        writePendingNewLines(true)
-        output.append('\n')
+        writePendingNewLines(1)
         currentState = STATE_BEGIN_TEXT
-        hasTrailingNewLine = true
     }
 
     private inline fun CharSequence.indexOfFirst(startIndex: Int, predicate: (Char) -> Boolean): Int {
@@ -92,18 +111,19 @@ internal class HtmlTextWriter(private val output: Appendable) {
         return -1
     }
 
-    private fun writePendingNewLines(isLineBreak: Boolean) {
+    private fun writePendingNewLines(resetNewLineCount: Int) {
         var newLineCount = pendingNewLineCount
-        if (newLineCount != 0) {
-            if (newLineCount > 0) {
-                if (hasTrailingNewLine) {
-                    newLineCount--
-                }
-                repeat(newLineCount) {
-                    output.append('\n')
-                }
+        if (newLineCount != resetNewLineCount) {
+            pendingNewLineCount = resetNewLineCount
+        }
+        if (newLineCount > 0) {
+            if (hasParagraphStyle) {
+                newLineCount--
+                hasParagraphStyle = false
             }
-            pendingNewLineCount = 0
+            repeat(newLineCount) {
+                output.append('\n')
+            }
         }
         pendingIndentCount.let { indentCount ->
             if (indentCount > 0) {
@@ -113,7 +133,6 @@ internal class HtmlTextWriter(private val output: Appendable) {
                 pendingIndentCount = 0
             }
         }
-        hasTrailingNewLine = isLineBreak
     }
 
     companion object {

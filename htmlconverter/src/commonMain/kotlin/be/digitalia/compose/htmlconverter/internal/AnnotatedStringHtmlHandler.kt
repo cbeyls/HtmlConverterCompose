@@ -108,7 +108,7 @@ internal class AnnotatedStringHtmlHandler(
             blockIndentLevel++
         }
         // Paragraph style will automatically add one prefix new line
-        textWriter.markBlockTransition(if (compactMode) 0 else prefixNewLineCount - 1, 0)
+        textWriter.markParagraphStyleBoundary(if (compactMode) 1 else prefixNewLineCount)
     }
 
     private fun handleListStart(initialIndex: Int) {
@@ -225,7 +225,7 @@ internal class AnnotatedStringHtmlHandler(
 
     private fun handleBlockEnd(suffixNewLineCount: Int, indent: Boolean) {
         // Paragraph style will automatically add one prefix new line
-        textWriter.markBlockTransition(if (compactMode) 0 else suffixNewLineCount - 1, 0)
+        textWriter.markParagraphStyleBoundary(if (compactMode) 1 else suffixNewLineCount)
         addPendingParagraph()
         blockStartIndex = -1
         if (indent) {
