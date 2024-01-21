@@ -35,7 +35,10 @@ internal class AnnotatedStringHtmlHandler(
     private val compactMode: Boolean,
     private val style: HtmlStyle
 ) : HtmlHandler {
-    private val textWriter = HtmlTextWriter(builder)
+    private val textWriter = HtmlTextWriter(builder) {
+        pushPendingSpanStyles()
+    }
+    private val pendingSpanStyles = mutableListOf<SpanStyle>()
     private var listLevel = 0
     // A negative index means the list is unordered
     private var listIndexes: IntArray = EMPTY_LIST_INDEXES
@@ -44,6 +47,16 @@ internal class AnnotatedStringHtmlHandler(
     private var skippedTagsLevel = 0
     private var blockStartIndex = -1
     private var blockIndentLevel = 0
+
+    private fun pushPendingSpanStyles() {
+        val size = pendingSpanStyles.size
+        if (size != 0) {
+            for (i in 0..<size) {
+                builder.pushStyle(pendingSpanStyles[i])
+            }
+            pendingSpanStyles.clear()
+        }
+    }
 
     override fun onOpenTag(name: String, attributes: (String) -> String?) {
         when (name) {
@@ -168,7 +181,8 @@ internal class AnnotatedStringHtmlHandler(
     }
 
     private fun handleSpanStyleStart(style: SpanStyle) {
-        builder.pushStyle(style)
+        // Defer pushing the span style until the actual content is about to be written
+        pendingSpanStyles.add(style)
     }
 
     @OptIn(ExperimentalTextApi::class)
@@ -266,7 +280,12 @@ internal class AnnotatedStringHtmlHandler(
     }
 
     private fun handleSpanStyleEnd() {
-        builder.pop()
+        val size = pendingSpanStyles.size
+        if (size == 0) {
+            builder.pop()
+        } else {
+            pendingSpanStyles.removeAt(size - 1)
+        }
     }
 
     private fun handleAnchorEnd() {

@@ -15,7 +15,10 @@
  */
 package be.digitalia.compose.htmlconverter.internal
 
-internal class HtmlTextWriter(private val output: Appendable) {
+internal class HtmlTextWriter(
+    private val output: Appendable,
+    private val onWriteContentStart: () -> Unit = {}
+) {
     private var currentState = STATE_BEGIN_TEXT
     // A negative value indicates new lines should be skipped for the next paragraph
     private var pendingNewLineCount = -1
@@ -63,6 +66,7 @@ internal class HtmlTextWriter(private val output: Appendable) {
             // Add a single space after content if at least one leading whitespace is detected
             if (state == STATE_CONTENT_IN_PROGRESS && contentStartIndex != index) {
                 contentStart = false
+                onWriteContentStart()
                 output.append(' ')
             }
             if (contentStartIndex == -1) {
@@ -73,6 +77,7 @@ internal class HtmlTextWriter(private val output: Appendable) {
             if (contentStart) {
                 writePendingNewLines(0)
                 contentStart = false
+                onWriteContentStart()
             }
 
             index = text.indexOfFirst(contentStartIndex + 1) { it.isWhitespace() }
@@ -92,6 +97,7 @@ internal class HtmlTextWriter(private val output: Appendable) {
     fun writePreformatted(text: String) {
         if (text.isNotEmpty()) {
             writePendingNewLines(0)
+            onWriteContentStart()
             output.append(text)
             currentState = STATE_BEGIN_TEXT
         }
