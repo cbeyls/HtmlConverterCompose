@@ -61,6 +61,7 @@ internal class AnnotatedStringHtmlHandler(
     override fun onOpenTag(name: String, attributes: (String) -> String?) {
         when (name) {
             "br" -> handleLineBreakStart()
+            "hr" -> handleHorizontalRuleStart()
             "p" -> handleBlockStart(2, false)
             "blockquote" -> handleBlockStart(2, true)
             "div", "header", "footer", "main", "nav", "aside", "section", "article",
@@ -89,6 +90,10 @@ internal class AnnotatedStringHtmlHandler(
 
     private fun handleLineBreakStart() {
         textWriter.writeLineBreak()
+    }
+
+    private fun handleHorizontalRuleStart() {
+        textWriter.markBlockBoundary(if (compactMode) 1 else 2, 0)
     }
 
     /**
@@ -210,7 +215,8 @@ internal class AnnotatedStringHtmlHandler(
 
     override fun onCloseTag(name: String) {
         when (name) {
-            "br" -> {}
+            "br",
+            "hr" -> {}
             "p" -> handleBlockEnd(2, false)
             "blockquote" -> handleBlockEnd(2, true)
             "div", "header", "footer", "main", "nav", "aside", "section", "article",

@@ -115,6 +115,7 @@ The default implementation uses the [KtXml](https://github.com/kobjects/ktxml) m
 
 - Inline tags with styling: `strong`, `b` (**bold**), `em`, `cite`, `dfn`, `i` (*italic*), `big` (bigger text), `small` (smaller text), `tt`, `code` (`monospace font`), `a` ([hyperlink](#supported-html-tags)), `u` (underline), `del`, `s`, `strike` (~~strikethrough~~), `sup` (<sup>supertext</sup>), `sub` (<sub>subtext</sub>)
 - Block tags (paragraphs): `p`, `blockquote`, `pre` (including `monospace font`), `div`, `header`, `footer`, `main`, `nav`, `aside`, `section`, `article`, `address`, `figure`, `figcaption`, `video`, `audio` (no player shown, only inline text)
+- Horizontal rule: `hr` (no line drawn, but marks a new paragraph)
 - Lists: `ul`, `ol`, `li`, `dl`, `dt`, `dd`
 - Section headings: `h1`, `h2`, `h3`, `h4`, `h5`, `h6`
 - Line break: `br`

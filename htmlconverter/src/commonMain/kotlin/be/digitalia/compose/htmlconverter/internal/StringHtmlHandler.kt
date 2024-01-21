@@ -34,6 +34,7 @@ internal class StringHtmlHandler(
     override fun onOpenTag(name: String, attributes: (String) -> String?) {
         when (name) {
             "br" -> handleLineBreakStart()
+            "hr" -> handleHorizontalRuleStart()
             "p", "blockquote" -> handleBlockStart(2, 0)
             "div", "header", "footer", "main", "nav", "aside", "section", "article",
             "address", "figure", "figcaption",
@@ -51,6 +52,10 @@ internal class StringHtmlHandler(
 
     private fun handleLineBreakStart() {
         textWriter.writeLineBreak()
+    }
+
+    private fun handleHorizontalRuleStart() {
+        textWriter.markBlockBoundary(if (compactMode) 1 else 2, 0)
     }
 
     private fun handleBlockStart(prefixNewLineCount: Int, indentCount: Int) {
@@ -113,7 +118,8 @@ internal class StringHtmlHandler(
 
     override fun onCloseTag(name: String) {
         when (name) {
-            "br" -> {}
+            "br",
+            "hr" -> {}
             "p", "blockquote" -> handleBlockEnd(2)
             "div", "header", "footer", "main", "nav", "aside", "section", "article",
             "address", "figure", "figcaption",
