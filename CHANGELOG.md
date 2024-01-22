@@ -7,7 +7,7 @@ _2024-01-22_
 
 Bug fixes:
 - Don't apply span styles on line breaks immediately preceding the opening tag
-- Fix too many line breaks added when a <br> tag is followed by a simple block.
+- Fix too many line breaks added when a `<br>` tag is followed by a simple block.
 
 New features:
 - Add basic support for `<hr>` (and `<hr/>`) tag for paragraph separation.
