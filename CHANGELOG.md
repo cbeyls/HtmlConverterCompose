@@ -1,6 +1,18 @@
 Change Log
 ==========
 
+## Version 0.9.4
+
+_2024-01-24_
+
+Bug fixes:
+- Fix incorrect number of line breaks around empty blocks and paragraphs
+- Fix incorrect block indentation after nested block.
+
+This release depends on:
+- Kotlin **1.9.21**
+- Compose Multiplatform **1.5.11** (Jetpack Compose UI **1.5.4**)
+
 ## Version 0.9.3
 
 _2024-01-22_
