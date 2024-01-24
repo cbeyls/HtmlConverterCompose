@@ -17,37 +17,35 @@ package be.digitalia.compose.htmlconverter.internal
 
 internal class HtmlTextWriter(
     private val output: Appendable,
-    private val onWriteContentStart: () -> Unit = {}
+    private val callbacks: Callbacks? = null
 ) {
+    interface Callbacks {
+        /**
+         * Called when new lines are about to be written before content at a block boundary.
+         * Allows to override the number of written new lines.
+         */
+        fun onWriteNewLines(newLineCount: Int): Int
+
+        /**
+         * Called when non-empty content is about to be written.
+         */
+        fun onWriteContentStart()
+    }
+
     private var currentState = STATE_BEGIN_TEXT
     // A negative value indicates new lines should be skipped for the next paragraph
     private var pendingNewLineCount = -1
-    private var hasParagraphStyle = false
     private var pendingIndentCount = 0
 
-    /**
-     * @return the updated pending new line count.
-     */
-    fun markBlockBoundary(newLineCount: Int, indentCount: Int): Int {
+    fun markBlockBoundary(newLineCount: Int, indentCount: Int) {
         require(newLineCount > 0) { "newLineCount must be positive" }
-        var currentNewLineCount = pendingNewLineCount
-        if (currentNewLineCount >= 0) {
-            currentNewLineCount = maxOf(currentNewLineCount, newLineCount)
-            pendingNewLineCount = currentNewLineCount
+        pendingNewLineCount.let {
+            if (it >= 0) {
+                pendingNewLineCount = maxOf(it, newLineCount)
+            }
         }
         pendingIndentCount = indentCount
         currentState = STATE_BEGIN_TEXT
-        return currentNewLineCount
-    }
-
-    /**
-     * Same as markBlockBoundary() with an indentCount of 0
-     * and omitting a single new line at the end because ParagraphStyle adds one.
-     */
-    fun markParagraphStyleBoundary(newLineCount: Int) {
-        if (markBlockBoundary(newLineCount, 0) > 0) {
-            hasParagraphStyle = true
-        }
     }
 
     /**
@@ -66,7 +64,7 @@ internal class HtmlTextWriter(
             // Add a single space after content if at least one leading whitespace is detected
             if (state == STATE_CONTENT_IN_PROGRESS && contentStartIndex != index) {
                 contentStart = false
-                onWriteContentStart()
+                callbacks?.onWriteContentStart()
                 output.append(' ')
             }
             if (contentStartIndex == -1) {
@@ -77,7 +75,7 @@ internal class HtmlTextWriter(
             if (contentStart) {
                 writePendingNewLines(0)
                 contentStart = false
-                onWriteContentStart()
+                callbacks?.onWriteContentStart()
             }
 
             index = text.indexOfFirst(contentStartIndex + 1) { it.isWhitespace() }
@@ -97,7 +95,7 @@ internal class HtmlTextWriter(
     fun writePreformatted(text: String) {
         if (text.isNotEmpty()) {
             writePendingNewLines(0)
-            onWriteContentStart()
+            callbacks?.onWriteContentStart()
             output.append(text)
             currentState = STATE_BEGIN_TEXT
         }
@@ -118,17 +116,14 @@ internal class HtmlTextWriter(
     }
 
     private fun writePendingNewLines(resetNewLineCount: Int) {
-        var newLineCount = pendingNewLineCount
-        if (newLineCount != resetNewLineCount) {
-            pendingNewLineCount = resetNewLineCount
-        }
-        if (newLineCount > 0) {
-            if (hasParagraphStyle) {
-                newLineCount--
-                hasParagraphStyle = false
+        pendingNewLineCount.let { newLineCount ->
+            if (newLineCount != resetNewLineCount) {
+                pendingNewLineCount = resetNewLineCount
             }
-            repeat(newLineCount) {
-                output.append('\n')
+            if (newLineCount > 0) {
+                repeat(callbacks?.onWriteNewLines(newLineCount) ?: newLineCount) {
+                    output.append('\n')
+                }
             }
         }
         pendingIndentCount.let { indentCount ->
