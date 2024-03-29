@@ -1,6 +1,16 @@
 Change Log
 ==========
 
+## Version 0.9.5
+
+_2024-03-29_
+
+Updated dependencies.
+
+This release depends on:
+- Kotlin **1.9.23**
+- Compose Multiplatform **1.6.1** (Jetpack Compose UI **1.6.3**)
+
 ## Version 0.9.4
 
 _2024-01-24_
