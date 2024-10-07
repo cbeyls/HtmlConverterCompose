@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.unit.dp
 import be.digitalia.compose.htmlconverter.HtmlStyle
 import be.digitalia.compose.htmlconverter.htmlToAnnotatedString
@@ -21,7 +22,11 @@ fun App() {
         val convertedText = remember(linkColor) {
             htmlToAnnotatedString(
                 SampleHtml().get(),
-                style = HtmlStyle(linkSpanStyle = SpanStyle(color = linkColor))
+                style = HtmlStyle(
+                    textLinkStyles = TextLinkStyles(
+                        style = SpanStyle(color = linkColor)
+                    )
+                )
             )
         }
         Column(
