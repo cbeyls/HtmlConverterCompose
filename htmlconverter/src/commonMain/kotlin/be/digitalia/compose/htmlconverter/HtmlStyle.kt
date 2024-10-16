@@ -17,6 +17,7 @@ package be.digitalia.compose.htmlconverter
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
@@ -26,7 +27,9 @@ public data class HtmlStyle(
     /**
      * Optional style for hyperlinks (<a> tags). Default is a simple underline.
       */
-    val linkSpanStyle: SpanStyle? = SpanStyle(textDecoration = TextDecoration.Underline),
+    val textLinkStyles: TextLinkStyles? = TextLinkStyles(
+        style = SpanStyle(textDecoration = TextDecoration.Underline)
+    ),
     /**
      * Unit of indentation for block quotations and nested lists. Default is 24 sp.
      */

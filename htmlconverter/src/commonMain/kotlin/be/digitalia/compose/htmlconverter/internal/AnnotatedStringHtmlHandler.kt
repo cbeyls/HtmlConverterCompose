@@ -16,10 +16,10 @@
 package be.digitalia.compose.htmlconverter.internal
 
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.LinkInteractionListener
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.UrlAnnotation
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -33,7 +33,8 @@ import be.digitalia.compose.htmlconverter.HtmlStyle
 internal class AnnotatedStringHtmlHandler(
     private val builder: AnnotatedString.Builder,
     private val compactMode: Boolean,
-    private val style: HtmlStyle
+    private val style: HtmlStyle,
+    private val linkInteractionListener: LinkInteractionListener?
 ) : HtmlHandler {
     private val textWriter = HtmlTextWriter(builder, object : HtmlTextWriter.Callbacks {
         override fun onWriteNewLines(newLineCount: Int): Int {
@@ -205,12 +206,14 @@ internal class AnnotatedStringHtmlHandler(
         pendingSpanStyles.add(style)
     }
 
-    @OptIn(ExperimentalTextApi::class)
     private fun handleAnchorStart(url: String) {
-        builder.pushUrlAnnotation(UrlAnnotation(url))
-        style.linkSpanStyle?.let {
-            handleSpanStyleStart(it)
-        }
+        builder.pushLink(
+            LinkAnnotation.Url(
+                url = url,
+                styles = style.textLinkStyles,
+                linkInteractionListener = linkInteractionListener
+            )
+        )
     }
 
     private fun handleHeadingStart(name: String) {
@@ -318,9 +321,6 @@ internal class AnnotatedStringHtmlHandler(
     }
 
     private fun handleAnchorEnd() {
-        if (style.linkSpanStyle != null) {
-            handleSpanStyleEnd()
-        }
         builder.pop()
     }
 

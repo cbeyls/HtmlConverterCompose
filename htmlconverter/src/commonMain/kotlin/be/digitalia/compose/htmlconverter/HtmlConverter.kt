@@ -18,6 +18,7 @@
 package be.digitalia.compose.htmlconverter
 
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.LinkInteractionListener
 import be.digitalia.compose.htmlconverter.internal.AnnotatedStringHtmlHandler
 import be.digitalia.compose.htmlconverter.internal.StringHtmlHandler
 import be.digitalia.compose.htmlconverter.internal.parser.KtXmlParser
@@ -28,9 +29,15 @@ import be.digitalia.compose.htmlconverter.internal.parser.KtXmlParser
 public fun htmlToAnnotatedString(
     html: String,
     compactMode: Boolean = false,
-    style: HtmlStyle = HtmlStyle.DEFAULT
+    style: HtmlStyle = HtmlStyle.DEFAULT,
+    linkInteractionListener: LinkInteractionListener? = null
 ): AnnotatedString {
-    return htmlToAnnotatedString(KtXmlParser(html.iterator()), compactMode, style)
+    return htmlToAnnotatedString(
+        KtXmlParser(html.iterator()),
+        compactMode,
+        style,
+        linkInteractionListener
+    )
 }
 
 /**
@@ -39,10 +46,11 @@ public fun htmlToAnnotatedString(
 public fun htmlToAnnotatedString(
     parser: HtmlParser,
     compactMode: Boolean = false,
-    style: HtmlStyle = HtmlStyle.DEFAULT
+    style: HtmlStyle = HtmlStyle.DEFAULT,
+    linkInteractionListener: LinkInteractionListener? = null
 ): AnnotatedString {
     val builder = AnnotatedString.Builder()
-    parser.parse(AnnotatedStringHtmlHandler(builder, compactMode, style))
+    parser.parse(AnnotatedStringHtmlHandler(builder, compactMode, style, linkInteractionListener))
     return builder.toAnnotatedString()
 }
 

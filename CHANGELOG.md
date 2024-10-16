@@ -1,6 +1,22 @@
 Change Log
 ==========
 
+## Version 1.0.0
+
+_2024-10-17_
+
+New features:
+- Clickable links are now handled automatically and will be opened using the platform's default browser
+- Replace `linkSpanStyle` with `textLinkStyles` to allow custom link styles for focused, hovered and pressed states
+- Add `linkInteractionListener` argument to allow overriding the default link click action.
+
+Enhancements:
+- Use the new `LinkAnnotation.Url` from Compose 1.7 in place of the deprecated `UrlAnnotation` to handle clickable anchor links.
+
+This release depends on:
+- Kotlin **2.0.21**
+- Compose Multiplatform **1.7.0** (Jetpack Compose UI **1.7.1**)
+
 ## Version 0.9.5
 
 _2024-03-29_

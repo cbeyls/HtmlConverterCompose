@@ -24,7 +24,7 @@ Add the dependency to your **module**'s `build.gradle` or `build.gradle.kts` fil
 
 ```kotlin
 dependencies {
-    implementation("be.digitalia.compose.htmlconverter:htmlconverter:0.9.5")
+    implementation("be.digitalia.compose.htmlconverter:htmlconverter:1.0.0")
 }
 ```
 
@@ -34,7 +34,7 @@ For Kotlin Multiplatform projects:
 sourceSets {
     val commonMain by getting {
         dependencies {
-            implementation("be.digitalia.compose.htmlconverter:htmlconverter:0.9.5")
+            implementation("be.digitalia.compose.htmlconverter:htmlconverter:1.0.0")
         }
     }
 }
@@ -65,7 +65,7 @@ Both functions take an optional `compactMode` boolean argument. When set to `tru
 
 The `htmlToAnnotatedString()` function takes an optional `style` argument of type `HtmlStyle` which allows to customize styling. The currently provided options are:
 
-- `linkSpanStyle`: Optional style for hyperlinks (content of `a` tags). Default is a simple underline. When set to `null`, hyperlinks will not be styled, which can be useful in case they are not clickable (see next section).
+- `textLinkStyles`: Optional collection of styles for hyperlinks (content of `a` tags). Default is a simple underline. When set to `null`, hyperlinks will not be styled, which can be useful when they are not clickable (see next section).
 - `indentUnit`: Unit of indentation for block quotations and nested lists. Default is **24 sp**. Note that `em` units are not yet supported for indentation in Compose Desktop.
 
 For example, here is how to style hyperlinks to use the theme's primary color with no underline:
@@ -75,7 +75,11 @@ val linkColor = MaterialTheme.colors.primary
 val convertedText = remember(html, linkColor) {
     htmlToAnnotatedString(
         html,
-        style = HtmlStyle(linkSpanStyle = SpanStyle(color = linkColor))
+        style = HtmlStyle(
+            textLinkStyles = TextLinkStyles(
+                style = SpanStyle(color = linkColor)
+            )
+        )
     )
 }
 Text(
@@ -86,20 +90,24 @@ Text(
 
 ### Handling hyperlink clicks
 
-Hyperlinks (content of `a` tags) will be annotated with the experimental [`UrlAnnotation`](https://developer.android.com/reference/kotlin/androidx/compose/ui/text/UrlAnnotation). It is required to add custom code to detect clicks on these annotations and handle the navigation action accordingly.
+Hyperlinks (content of `a` tags) will be annotated with [`LinkAnnotation.Url`](https://developer.android.com/reference/kotlin/androidx/compose/ui/text/LinkAnnotation.Url). When clicked, they will automatically be handled by the default [`UriHandler`](https://developer.android.com/reference/kotlin/androidx/compose/ui/platform/UriHandler) which will open them using the platform's default browser.
 
-For example, the `ClickableText` composable can be used, even if that solution is not perfect because it captures all touch events:
+To override that behavior or disable click handling completely, specify a custom `linkInteractionListener` argument:
 
 ```kotlin
-val convertedText = remember(html) { htmlToAnnotatedString(html) }
-ClickableText(
+val convertedText = remember(html) {
+    htmlToAnnotatedString(
+        html,
+        linkInteractionListener = { link ->
+            if (link is LinkAnnotation.Url) {
+                navigateTo(link.url)
+            }
+        }
+    )
+}
+Text(
     text = convertedText,
-    modifier = Modifier.fillMaxWidth(),
-    onClick = { position ->
-        convertedText
-            .getUrlAnnotations(position, position)
-            .firstOrNull()?.let { range -> onLinkClick(range.item.url) }
-    }
+    modifier = Modifier.fillMaxWidth()
 )
 ```
 
@@ -134,14 +142,13 @@ All HTML entities appearing in the text will be properly decoded as well.
 ## What to expect from future versions
 
 - Unit tests
-- Better clickable hyperlinks support
 - Support for displaying images as inline content
 - iOS support (with help from the community).
 
 ## License
 
 ```
-Copyright (C) 2023 Christophe Beyls
+Copyright (C) 2023-2024 Christophe Beyls
  
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
