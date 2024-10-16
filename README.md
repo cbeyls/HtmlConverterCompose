@@ -90,7 +90,7 @@ Text(
 
 ### Handling hyperlink clicks
 
-Hyperlinks (content of `a` tags) will be annotated with [`LinkAnnotation.Url`](https://developer.android.com/reference/kotlin/androidx/compose/ui/text/LinkAnnotation.Url). When clicked, they will automatically be handled by the default UriHandler which will open them using the platform's default browser.
+Hyperlinks (content of `a` tags) will be annotated with [`LinkAnnotation.Url`](https://developer.android.com/reference/kotlin/androidx/compose/ui/text/LinkAnnotation.Url). When clicked, they will automatically be handled by the default [`UriHandler`](https://developer.android.com/reference/kotlin/androidx/compose/ui/platform/UriHandler) which will open them using the platform's default browser.
 
 To override that behavior or disable click handling completely, specify a custom `linkInteractionListener` argument:
 
