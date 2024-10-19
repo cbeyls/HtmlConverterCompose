@@ -57,9 +57,12 @@ internal class AnnotatedStringHtmlHandler(
     private var preformattedLevel = 0
     private var boldLevel = 0
     private var skippedTagsLevel = 0
-    private var blockLevel = 0
+    private var blockLevel = if (isParagraphSupportDisabled) -1 else 0
     private var blockIndentLevel = 0
     private var paragraphStartIndex = -1
+
+    private val isParagraphSupportDisabled: Boolean
+        get() = style.indentUnit.let { it.value.isNaN() || it.value == 0f }
 
     private fun pushPendingSpanStyles() {
         val size = pendingSpanStyles.size
@@ -134,12 +137,16 @@ internal class AnnotatedStringHtmlHandler(
     }
 
     private fun handleBlockStart(prefixNewLineCount: Int, indent: Boolean) {
-        val currentIndex = builder.length
-        addPendingParagraph(currentIndex)
-        paragraphStartIndex = currentIndex
-        blockLevel++
-        if (indent) {
-            blockIndentLevel++
+        var level = blockLevel
+        if (level >= 0) {
+            val currentIndex = builder.length
+            addPendingParagraph(currentIndex)
+            paragraphStartIndex = currentIndex
+            level++
+            blockLevel = level
+            if (indent) {
+                blockIndentLevel++
+            }
         }
         textWriter.markBlockBoundary(if (compactMode) 1 else prefixNewLineCount, 0)
     }
@@ -262,19 +269,22 @@ internal class AnnotatedStringHtmlHandler(
     }
 
     private fun handleBlockEnd(suffixNewLineCount: Int, indent: Boolean) {
-        val currentIndex = builder.length
-        // Paragraph will only be added if non-empty
-        val hasTrailingParagraph = addPendingParagraph(currentIndex)
-        val level = blockLevel - 1
-        blockLevel = level
-        if (indent) {
-            blockIndentLevel--
-        }
-        paragraphStartIndex = if (level == 0) {
-            // Encode the end position of the trailing paragraph as a negative value using bit inversion
-            if (hasTrailingParagraph) currentIndex.inv() else -1
-        } else {
-            currentIndex
+        var level = blockLevel
+        if (level >= 0) {
+            val currentIndex = builder.length
+            // Paragraph will only be added if non-empty
+            val hasTrailingParagraph = addPendingParagraph(currentIndex)
+            level--
+            blockLevel = level
+            if (indent) {
+                blockIndentLevel--
+            }
+            paragraphStartIndex = if (level == 0) {
+                // Encode the end position of the trailing paragraph as a negative value using bit inversion
+                if (hasTrailingParagraph) currentIndex.inv() else -1
+            } else {
+                currentIndex
+            }
         }
         textWriter.markBlockBoundary(if (compactMode) 1 else suffixNewLineCount, 0)
     }
