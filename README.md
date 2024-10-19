@@ -24,7 +24,7 @@ Add the dependency to your **module**'s `build.gradle` or `build.gradle.kts` fil
 
 ```kotlin
 dependencies {
-    implementation("be.digitalia.compose.htmlconverter:htmlconverter:1.0.1")
+    implementation("be.digitalia.compose.htmlconverter:htmlconverter:1.0.2")
 }
 ```
 
@@ -34,7 +34,7 @@ For Kotlin Multiplatform projects:
 sourceSets {
     val commonMain by getting {
         dependencies {
-            implementation("be.digitalia.compose.htmlconverter:htmlconverter:1.0.1")
+            implementation("be.digitalia.compose.htmlconverter:htmlconverter:1.0.2")
         }
     }
 }
@@ -66,7 +66,7 @@ Both functions take an optional `compactMode` boolean argument. When set to `tru
 The `htmlToAnnotatedString()` function takes an optional `style` argument of type `HtmlStyle` which allows to customize styling. The currently provided options are:
 
 - `textLinkStyles`: Optional collection of styles for hyperlinks (content of `a` tags). Default is a simple underline. When set to `null`, hyperlinks will not be styled, which can be useful when they are not clickable (see next section).
-- `indentUnit`: Unit of indentation for block quotations and nested lists. Default is **24 sp**. Note that `em` units are not yet supported for indentation in Compose Desktop.
+- `indentUnit`: Unit of indentation for block quotations and nested lists. Default is **24 sp**. Note that `em` units are not yet supported for indentation in Compose Desktop. Set to `0.sp` or `TextUnit.Unspecified` to disable indentation support.
 
 For example, here is how to style hyperlinks to use the theme's primary color with no underline:
 
@@ -110,6 +110,29 @@ Text(
     modifier = Modifier.fillMaxWidth()
 )
 ```
+
+### Bug when showing hyperlinks in combination with maxLines
+
+Compose UI 1.7.x has an unsolved bug which triggers a crash when a `Text` composable using `maxLines` is displaying an `AnnotatedString` containing a `LinkAnnotation` inside a paragraph.
+
+This library is vulnerable to that bug because it uses both `LinkAnnotation` to display hyperlinks and paragraphs to handle text indentation.
+
+As a workaround, you can disable indentation support in `Text` composables which require the usage of `maxLines`:
+
+```kotlin
+val convertedText = remember(html) {
+    htmlToAnnotatedString(
+        html,
+        style = HtmlStyle(indentUnit = TextUnit.Unspecified)
+    )
+}
+Text(
+    text = convertedText,
+    maxLines = 3
+)
+```
+
+See related bug reports [374115892](https://issuetracker.google.com/issues/374115892), [372390054](https://issuetracker.google.com/issues/372390054) on the Google issue tracker.
 
 ### Custom parsing
 

@@ -1,6 +1,20 @@
 Change Log
 ==========
 
+## Version 1.0.2
+
+_2024-10-20_
+
+Bug fix:
+- Display the correct number of line breaks when a `<br>` tag is present between blocks requiring a single line break.
+
+New features:
+- Allow disabling paragraph logic completely by setting an undefined indent unit to work around a bug in Compose UI.
+
+This release depends on:
+- Kotlin **2.0.21**
+- Compose Multiplatform **1.7.0** (Jetpack Compose UI **1.7.1**)
+
 ## Version 1.0.1
 
 _2024-10-17_
