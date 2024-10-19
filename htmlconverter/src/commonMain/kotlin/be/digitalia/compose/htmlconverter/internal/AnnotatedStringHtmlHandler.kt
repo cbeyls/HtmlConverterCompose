@@ -37,13 +37,19 @@ internal class AnnotatedStringHtmlHandler(
     private val linkInteractionListener: LinkInteractionListener?
 ) : HtmlHandler {
     private val textWriter = HtmlTextWriter(builder, object : HtmlTextWriter.Callbacks {
+        private var consumedNewLineIndex = -1
+
         override fun onWriteNewLines(newLineCount: Int): Int {
             val currentIndex = builder.length
-            val paragraphIndex = paragraphStartIndex
-            // Paragraph style will automatically add one new line at its start and its end
-            return if (currentIndex == paragraphIndex || currentIndex == paragraphIndex.inv())
-                newLineCount - 1
-            else newLineCount
+            if (currentIndex != consumedNewLineIndex) {
+                val paragraphIndex = paragraphStartIndex
+                if (currentIndex == paragraphIndex || currentIndex == paragraphIndex.inv()) {
+                    // Paragraph style will automatically add a single new line at each boundary
+                    consumedNewLineIndex = currentIndex
+                    return newLineCount - 1
+                }
+            }
+            return newLineCount
         }
 
         override fun onWriteContentStart() {
@@ -279,11 +285,9 @@ internal class AnnotatedStringHtmlHandler(
             if (indent) {
                 blockIndentLevel--
             }
-            paragraphStartIndex = if (level == 0) {
+            if (hasTrailingParagraph) {
                 // Encode the end position of the trailing paragraph as a negative value using bit inversion
-                if (hasTrailingParagraph) currentIndex.inv() else -1
-            } else {
-                currentIndex
+                paragraphStartIndex = if (level == 0) currentIndex.inv() else currentIndex
             }
         }
         textWriter.markBlockBoundary(if (compactMode) 1 else suffixNewLineCount, 0)
