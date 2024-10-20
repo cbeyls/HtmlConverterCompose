@@ -42,8 +42,8 @@ internal class AnnotatedStringHtmlHandler(
         override fun onWriteNewLines(newLineCount: Int): Int {
             val currentIndex = builder.length
             if (currentIndex != consumedNewLineIndex) {
-                val paragraphIndex = paragraphStartIndex
-                if (currentIndex == paragraphIndex || currentIndex == paragraphIndex.inv()) {
+                val startIndex = paragraphStartIndex
+                if (currentIndex == startIndex || (startIndex < 0 && currentIndex == paragraphEndIndex)) {
                     // Paragraph style will automatically add a single new line at each boundary
                     consumedNewLineIndex = currentIndex
                     return newLineCount - 1
@@ -66,6 +66,7 @@ internal class AnnotatedStringHtmlHandler(
     private var blockLevel = if (isParagraphSupportDisabled) -1 else 0
     private var blockIndentLevel = 0
     private var paragraphStartIndex = -1
+    private var paragraphEndIndex = -1
 
     private val isParagraphSupportDisabled: Boolean
         get() = style.indentUnit.let { it.value.isNaN() || it.value == 0f }
@@ -279,16 +280,16 @@ internal class AnnotatedStringHtmlHandler(
         if (level >= 0) {
             val currentIndex = builder.length
             // Paragraph will only be added if non-empty
-            val hasTrailingParagraph = addPendingParagraph(currentIndex)
+            if (addPendingParagraph(currentIndex)) {
+                paragraphEndIndex = currentIndex
+            }
             level--
             blockLevel = level
             if (indent) {
                 blockIndentLevel--
             }
-            if (hasTrailingParagraph) {
-                // Encode the end position of the trailing paragraph as a negative value using bit inversion
-                paragraphStartIndex = if (level == 0) currentIndex.inv() else currentIndex
-            }
+            // Start a new paragraph automatically unless we're back at level 0
+            paragraphStartIndex = if (level == 0) -1 else currentIndex
         }
         textWriter.markBlockBoundary(if (compactMode) 1 else suffixNewLineCount, 0)
     }
