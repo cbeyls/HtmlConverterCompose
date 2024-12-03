@@ -1,14 +1,14 @@
 [versions]
-androidGradlePlugin = "8.7.1"
+androidGradlePlugin = "8.7.3"
 androidx-activity-compose = "1.9.3"
-jetbrainsCompose = "1.7.0"
+jetbrainsCompose = "1.7.1"
 kotlin = "2.0.21"
 ktxml = "0.3.2"
 maven-publish = "0.30.0"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
-ktxml = {  module = "org.kobjects.ktxml:core", version.ref = "ktxml" }
+ktxml = { module = "org.kobjects.ktxml:core", version.ref = "ktxml" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "androidGradlePlugin" }
