@@ -1,7 +1,7 @@
 [versions]
 androidGradlePlugin = "8.7.3"
 androidx-activity-compose = "1.9.3"
-jetbrainsCompose = "1.7.1"
+jetbrainsCompose = "1.7.3"
 kotlin = "2.1.0"
 ktxml = "0.3.2"
 maven-publish = "0.30.0"
