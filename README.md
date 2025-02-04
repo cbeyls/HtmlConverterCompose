@@ -14,6 +14,31 @@ It can be considered as a multiplatform replacement for Android's [`Html.fromHtm
 
 The Web platform should use the [DOM wrapper API](https://kotlinlang.org/api/latest/jvm/stdlib/org.w3c.dom/) to insert HTML directly in the web page.
 
+## Running the sample app
+
+#### Android
+
+* Open the project in Android Studio and click ▶ **sample** (run configuration) to build and run.
+* _OR_ from the command line: `./gradlew sample:installDebug` to install to a connected device.
+
+#### Desktop (JVM)
+
+* From the command line: `./gradlew sample:run`
+
+#### iOS
+
+* Open `iosApp/Sample.xcodeproj` in XCode.
+* Click ▶ **Sample** to build and run.
+
+#### Desktop (JVM) and iOS with Fleet or Android Studio
+
+If you have a recent version of Fleet installed, the platform targets should automatically be
+detected opening the project. Click ▶ to select a target device, build and run.
+
+Alternatively, you can use the [Kotlin Multiplatform Plugin](https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform)
+with Android Studio. Follow the [Run your application](https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-multiplatform-create-first-app.html#run-your-application)
+instructions to select or set up a run configuration for each target.
+
 ## Download
 
 [![Maven Central](https://img.shields.io/maven-central/v/be.digitalia.compose.htmlconverter/htmlconverter)](https://central.sonatype.com/search?q=g:be.digitalia.compose.htmlconverter)
