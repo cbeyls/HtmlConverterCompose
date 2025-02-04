@@ -6,13 +6,11 @@ It can also be used to convert HTML to unstyled text.
 It can be considered as a multiplatform replacement for Android's [`Html.fromHtml()`](https://developer.android.com/reference/android/text/Html#fromHtml(java.lang.String,%20int)) API with support for more tags and better performance.
 
 | Platform      | Supported |
-|---------------|----------|
+|---------------|-----------|
 | Android       | ✅        |
 | Desktop (JVM) | ✅        |
-| iOS           | ❌         |
-| Web           | ❌         |
-
-The iOS platform is not yet supported: testers and contributors are welcome.
+| iOS           | ✅        |
+| Web           | ❌        |
 
 The Web platform should use the [DOM wrapper API](https://kotlinlang.org/api/latest/jvm/stdlib/org.w3c.dom/) to insert HTML directly in the web page.
 
@@ -166,7 +164,6 @@ All HTML entities appearing in the text will be properly decoded as well.
 
 - Unit tests
 - Support for displaying images as inline content
-- iOS support (with help from the community).
 
 ## License
 
