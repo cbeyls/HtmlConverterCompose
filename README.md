@@ -1,3 +1,5 @@
+[![Continuous Integration](https://github.com/cbeyls/HtmlConverterCompose/actions/workflows/ci.yml/badge.svg)](https://github.com/cbeyls/HtmlConverterCompose/actions/workflows/ci.yml)
+
 # HTML Converter for Compose Multiplatform
 
 This library provides a simple API to convert HTML to Compose's [AnnotatedString](https://developer.android.com/reference/kotlin/androidx/compose/ui/text/AnnotatedString), including styling and paragraphs.
