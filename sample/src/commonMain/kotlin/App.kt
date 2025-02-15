@@ -32,13 +32,14 @@ fun App() {
         }
         Column(
             modifier = Modifier
-                .safeDrawingPadding()
                 .verticalScroll(scrollState)
                 .padding(16.dp)
         ) {
             Text(
                 text = convertedText,
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .safeDrawingPadding(),
                 style = MaterialTheme.typography.body1
             )
         }
