@@ -6,15 +6,38 @@ It can also be used to convert HTML to unstyled text.
 It can be considered as a multiplatform replacement for Android's [`Html.fromHtml()`](https://developer.android.com/reference/android/text/Html#fromHtml(java.lang.String,%20int)) API with support for more tags and better performance.
 
 | Platform      | Supported |
-|---------------|----------|
+|---------------|-----------|
 | Android       | ✅        |
 | Desktop (JVM) | ✅        |
-| iOS           | ❌         |
-| Web           | ❌         |
-
-The iOS platform is not yet supported: testers and contributors are welcome.
+| iOS           | ✅        |
+| Web           | ❌        |
 
 The Web platform should use the [DOM wrapper API](https://kotlinlang.org/api/latest/jvm/stdlib/org.w3c.dom/) to insert HTML directly in the web page.
+
+## Running the sample app
+
+#### Android
+
+* Open the project in Android Studio and click ▶ **sample** (run configuration) to build and run.
+* _OR_ from the command line: `./gradlew sample:installDebug` to install to a connected device.
+
+#### Desktop (JVM)
+
+* From the command line: `./gradlew sample:run`
+
+#### iOS
+
+* Open `iosApp/Sample.xcodeproj` in XCode.
+* Click ▶ **Sample** to build and run.
+
+#### Desktop (JVM) and iOS with Fleet or Android Studio
+
+If you have a recent version of Fleet installed, the platform targets should automatically be
+detected opening the project. Click ▶ to select a target device, build and run.
+
+Alternatively, you can use the [Kotlin Multiplatform Plugin](https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform)
+with Android Studio. Follow the [Run your application](https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-multiplatform-create-first-app.html#run-your-application)
+instructions to select or set up a run configuration for each target.
 
 ## Download
 
@@ -166,7 +189,6 @@ All HTML entities appearing in the text will be properly decoded as well.
 
 - Unit tests
 - Support for displaying images as inline content
-- iOS support (with help from the community).
 
 ## License
 

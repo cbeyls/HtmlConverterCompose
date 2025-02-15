@@ -10,6 +10,10 @@ plugins {
 kotlin {
     explicitApi()
 
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
+
     jvm {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)

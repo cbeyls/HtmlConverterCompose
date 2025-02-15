@@ -22,6 +22,7 @@ import androidx.compose.ui.text.LinkInteractionListener
 import be.digitalia.compose.htmlconverter.internal.AnnotatedStringHtmlHandler
 import be.digitalia.compose.htmlconverter.internal.StringHtmlHandler
 import be.digitalia.compose.htmlconverter.internal.parser.KtXmlParser
+import kotlin.jvm.JvmName
 
 /**
  * Convert HTML to AnnotatedString using the built-in parser.
