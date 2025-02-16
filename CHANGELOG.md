@@ -1,6 +1,20 @@
 Change Log
 ==========
 
+## Version 1.0.3
+
+_2025-02-16_
+
+Bug fix:
+- Add missing line break in case of empty block at level 0 with no preceding non-empty block.
+
+New features:
+- iOS support (#8) thanks to @myabc
+
+This release depends on:
+- Kotlin **2.1.0**
+- Compose Multiplatform **1.7.3** (Jetpack Compose UI **1.7.6**)
+
 ## Version 1.0.2
 
 _2024-10-20_

@@ -49,7 +49,7 @@ Add the dependency to your **module**'s `build.gradle` or `build.gradle.kts` fil
 
 ```kotlin
 dependencies {
-    implementation("be.digitalia.compose.htmlconverter:htmlconverter:1.0.2")
+    implementation("be.digitalia.compose.htmlconverter:htmlconverter:1.0.3")
 }
 ```
 
@@ -59,7 +59,7 @@ For Kotlin Multiplatform projects:
 sourceSets {
     val commonMain by getting {
         dependencies {
-            implementation("be.digitalia.compose.htmlconverter:htmlconverter:1.0.2")
+            implementation("be.digitalia.compose.htmlconverter:htmlconverter:1.0.3")
         }
     }
 }
@@ -195,7 +195,7 @@ All HTML entities appearing in the text will be properly decoded as well.
 ## License
 
 ```
-Copyright (C) 2023-2024 Christophe Beyls
+Copyright (C) 2023-2025 Christophe Beyls and contributors
  
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
