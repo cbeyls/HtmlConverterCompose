@@ -1,7 +1,9 @@
 name: Publish to Maven Central
 
 on:
-  pull_request:
+  push:
+    tags:
+      - '*'
 
 jobs:
   publish:
