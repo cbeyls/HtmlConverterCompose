@@ -32,7 +32,7 @@ internal class KtXmlParser(private val html: CharIterator) : HtmlParser {
         val tagStack = mutableListOf<String>()
 
         while (true) {
-            when (parser.next()) {
+            when (parser.nextToken()) {
                 EventType.START_TAG -> {
                     val lowerCaseName = parser.name.lowercase()
                     handler.onOpenTag(lowerCaseName, attributes)
@@ -65,7 +65,8 @@ internal class KtXmlParser(private val html: CharIterator) : HtmlParser {
                     }
                 }
 
-                EventType.TEXT -> handler.onText(parser.text)
+                EventType.TEXT, EventType.ENTITY_REF -> handler.onText(parser.text)
+                EventType.IGNORABLE_WHITESPACE -> handler.onText(" ")
                 EventType.END_DOCUMENT -> break
                 else -> {}
             }
