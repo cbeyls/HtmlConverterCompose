@@ -1,6 +1,17 @@
 Change Log
 ==========
 
+## Version 1.0.4
+
+_2025-05-04_
+
+Bug fix:
+- Fix missing whitespace between root-level tags.
+
+This release depends on:
+- Kotlin **2.1.20**
+- Compose Multiplatform **1.7.3** (Jetpack Compose UI **1.7.6**)
+
 ## Version 1.0.3
 
 _2025-02-16_

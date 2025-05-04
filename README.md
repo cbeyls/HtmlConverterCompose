@@ -49,7 +49,7 @@ Add the dependency to your **module**'s `build.gradle` or `build.gradle.kts` fil
 
 ```kotlin
 dependencies {
-    implementation("be.digitalia.compose.htmlconverter:htmlconverter:1.0.3")
+    implementation("be.digitalia.compose.htmlconverter:htmlconverter:1.0.4")
 }
 ```
 
@@ -59,7 +59,7 @@ For Kotlin Multiplatform projects:
 sourceSets {
     val commonMain by getting {
         dependencies {
-            implementation("be.digitalia.compose.htmlconverter:htmlconverter:1.0.3")
+            implementation("be.digitalia.compose.htmlconverter:htmlconverter:1.0.4")
         }
     }
 }
