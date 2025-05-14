@@ -15,6 +15,7 @@
  */
 package be.digitalia.compose.htmlconverter.internal
 
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.LinkInteractionListener
@@ -108,6 +109,7 @@ internal class AnnotatedStringHtmlHandler(
             "sub" -> handleSpanStyleStart(SpanStyle(baselineShift = BaselineShift.Subscript))
             "h1", "h2", "h3", "h4", "h5", "h6" -> handleHeadingStart(name)
             "script", "head", "table", "form", "fieldset" -> handleSkippedTagStart()
+            "span" -> handleSpanStart(attributes("style").orEmpty())
         }
     }
 
@@ -245,10 +247,35 @@ internal class AnnotatedStringHtmlHandler(
         skippedTagsLevel++
     }
 
+    private fun String.toComposeColor(): Color {
+        var colorStr = this.removePrefix("#")
+        if (colorStr.length == 8) colorStr = colorStr.drop(6) + colorStr.dropLast(2) // in compose, alpha digits are the two first
+        val colorInt = colorStr.toUIntOrNull(16) ?: return Color.Unspecified
+
+        return when (colorStr.length) {
+            6 -> Color(colorInt.toInt() or 0xFF000000.toInt())
+            8 -> Color(colorInt.toInt())
+            else -> Color.Unspecified
+        }
+    }
+
+    private val regex = Regex("""(?<!background-)color:\s*(#[A-Fa-f0-9]{6}(?:[A-Fa-f0-9]{2})?)""")
+    private fun extractHexColor(styleString: String): String {
+        return regex.find(styleString)?.groupValues?.get(1) ?: ""
+    }
+
+    private fun handleSpanStart(style: String) {
+        handleSpanStyleStart(
+            SpanStyle(
+                color = extractHexColor(style).toComposeColor()
+            )
+        )
+    }
+
     override fun onCloseTag(name: String) {
         when (name) {
             "br",
-            "hr" -> {}
+            "hr" -> { /* nothing to do */ }
             "p" -> handleBlockEnd(2, false)
             "blockquote" -> handleBlockEnd(2, true)
             "div", "header", "footer", "main", "nav", "aside", "section", "article",
@@ -266,7 +293,7 @@ internal class AnnotatedStringHtmlHandler(
             "small",
             "tt", "code",
             "u",
-            "del", "s", "strike",
+            "del", "s", "strike", "span",
             "sup",
             "sub" -> handleSpanStyleEnd()
             "a" -> handleAnchorEnd()
