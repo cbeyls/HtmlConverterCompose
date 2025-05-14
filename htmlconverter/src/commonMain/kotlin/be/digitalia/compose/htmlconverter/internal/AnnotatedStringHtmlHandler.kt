@@ -248,26 +248,19 @@ internal class AnnotatedStringHtmlHandler(
     }
 
     private fun String.toComposeColor(): Color {
-        val colorStr = this.removePrefix("#")
+        var colorStr = this.removePrefix("#")
+        if (colorStr.length == 8) colorStr = colorStr.drop(6) + colorStr.dropLast(2) // in compose, alpha digits are the two first
+        val colorInt = colorStr.toUIntOrNull(16) ?: return Color.Unspecified
+
         return when (colorStr.length) {
-            6 -> Color(
-                red = colorStr.substring(0, 2).toInt(16) / 255f,
-                green = colorStr.substring(2, 4).toInt(16) / 255f,
-                blue = colorStr.substring(4, 6).toInt(16) / 255f,
-                alpha = 1f
-            )
-            8 -> Color(
-                alpha = colorStr.substring(0, 2).toInt(16) / 255f,
-                red = colorStr.substring(2, 4).toInt(16) / 255f,
-                green = colorStr.substring(4, 6).toInt(16) / 255f,
-                blue = colorStr.substring(6, 8).toInt(16) / 255f
-            )
-            else -> Color.Black
+            6 -> Color(colorInt.toInt() or 0xFF000000.toInt())
+            8 -> Color(colorInt.toInt())
+            else -> Color.Unspecified
         }
     }
 
+    private val regex = Regex("""(?<!background-)color:\s*(#[A-Fa-f0-9]{6}(?:[A-Fa-f0-9]{2})?)""")
     private fun extractHexColor(styleString: String): String {
-        val regex = Regex("""color:\s*(#[A-Fa-f0-9]{6}(?:[A-Fa-f0-9]{2})?)""")
         return regex.find(styleString)?.groupValues?.get(1) ?: ""
     }
 
