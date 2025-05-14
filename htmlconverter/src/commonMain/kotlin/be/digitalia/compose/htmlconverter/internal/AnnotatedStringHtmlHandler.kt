@@ -109,7 +109,7 @@ internal class AnnotatedStringHtmlHandler(
             "sub" -> handleSpanStyleStart(SpanStyle(baselineShift = BaselineShift.Subscript))
             "h1", "h2", "h3", "h4", "h5", "h6" -> handleHeadingStart(name)
             "script", "head", "table", "form", "fieldset" -> handleSkippedTagStart()
-            "font" -> handleFontStart(attributes("color").orEmpty())
+            "span" -> handleSpanStart(attributes("style").orEmpty())
         }
     }
 
@@ -266,10 +266,15 @@ internal class AnnotatedStringHtmlHandler(
         }
     }
 
-    private fun handleFontStart(color: String) {
+    private fun extractHexColor(styleString: String): String {
+        val regex = Regex("""color:\s*(#[A-Fa-f0-9]{6}(?:[A-Fa-f0-9]{2})?)""")
+        return regex.find(styleString)?.groupValues?.get(1) ?: ""
+    }
+
+    private fun handleSpanStart(style: String) {
         handleSpanStyleStart(
             SpanStyle(
-                color = color.toComposeColor()
+                color = extractHexColor(style).toComposeColor()
             )
         )
     }
@@ -295,7 +300,7 @@ internal class AnnotatedStringHtmlHandler(
             "small",
             "tt", "code",
             "u",
-            "del", "s", "strike", "font",
+            "del", "s", "strike", "span",
             "sup",
             "sub" -> handleSpanStyleEnd()
             "a" -> handleAnchorEnd()

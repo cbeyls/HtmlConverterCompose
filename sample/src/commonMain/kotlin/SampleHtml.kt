@@ -11,7 +11,7 @@ class SampleHtml {
                 <li><u>Underline</u></li>
                 <li><del>Strikethrough</del></li>
                 <li><code>Code</code></li>
-                <li>Text with <font color="#FF0000">some part</font> in another color</li>
+                <li>Text with <span style="color:#FF0000">some part</span> in another color</li>
                 <li><a href="https://www.wikipedia.org/">Hyperlink with custom styling</a></li>
                 <li><big>Bigger</big> and <small>smaller</small> text</li>
                 <li><sup>Super</sup>text and <sub>sub</sub>text</li>
