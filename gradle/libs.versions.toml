@@ -1,10 +1,10 @@
 [versions]
-androidGradlePlugin = "8.9.2"
+androidGradlePlugin = "8.10.0"
 androidx-activity-compose = "1.10.1"
 jetbrainsCompose = "1.7.3"
-kotlin = "2.1.20"
+kotlin = "2.1.21"
 ktxml = "0.3.2"
-maven-publish = "0.31.0"
+maven-publish = "0.32.0"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
