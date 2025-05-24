@@ -15,11 +15,14 @@
  */
 package be.digitalia.compose.htmlconverter.internal
 
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.isUnspecified
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.LinkInteractionListener
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -81,6 +84,26 @@ internal class AnnotatedStringHtmlHandler(
         }
     }
 
+    private fun getStyleAttribute(attributes: (String) -> String?): String? {
+        return if (style.isTextColorEnabled) attributes("style") else null
+    }
+
+    private fun getOptionalColorFromStyle(style: String?): Color {
+        return if (style != null) getColorFromStyle(style) else Color.Unspecified
+    }
+
+    private fun getOptionalBackgroundFromStyle(style: String?): Color {
+        return if (style != null) getBackgroundColorFromStyle(style) else Color.Unspecified
+    }
+
+    private inline fun withColors(
+        noinline attributes: (String) -> String?,
+        block: (color: Color, background: Color) -> Unit
+    ) {
+        val style = getStyleAttribute(attributes)
+        block(getOptionalColorFromStyle(style), getOptionalBackgroundFromStyle(style))
+    }
+
     override fun onOpenTag(name: String, attributes: (String) -> String?) {
         when (name) {
             "br" -> handleLineBreakStart()
@@ -96,16 +119,71 @@ internal class AnnotatedStringHtmlHandler(
             "dt" -> handleDefinitionTermStart()
             "dd" -> handleDefinitionDetailStart()
             "pre" -> handlePreStart()
-            "strong", "b" -> handleBoldStart()
-            "em", "cite", "dfn", "i" -> handleSpanStyleStart(SpanStyle(fontStyle = FontStyle.Italic))
-            "big" -> handleSpanStyleStart(SpanStyle(fontSize = 1.25.em))
-            "small" -> handleSpanStyleStart(SpanStyle(fontSize = 0.8.em))
-            "tt", "code" -> handleSpanStyleStart(SpanStyle(fontFamily = FontFamily.Monospace))
-            "a" -> handleAnchorStart(attributes("href").orEmpty())
-            "u" -> handleSpanStyleStart(SpanStyle(textDecoration = TextDecoration.Underline))
-            "del", "s", "strike" -> handleSpanStyleStart(SpanStyle(textDecoration = TextDecoration.LineThrough))
-            "sup" -> handleSpanStyleStart(SpanStyle(baselineShift = BaselineShift.Superscript))
-            "sub" -> handleSpanStyleStart(SpanStyle(baselineShift = BaselineShift.Subscript))
+            "strong", "b" -> withColors(attributes) { color, background ->
+                handleBoldStart(color, background)
+            }
+            "em", "cite", "dfn", "i" -> withColors(attributes) { color, background ->
+                handleSpanStyleStart(SpanStyle(color = color, background = background, fontStyle = FontStyle.Italic))
+            }
+            "big" -> withColors(attributes) { color, background ->
+                handleSpanStyleStart(SpanStyle(color = color, background = background, fontSize = 1.25.em))
+            }
+            "small" -> withColors(attributes) { color, background ->
+                handleSpanStyleStart(SpanStyle(color = color, background = background, fontSize = 0.8.em))
+            }
+            "tt", "code" -> withColors(attributes) { color, background ->
+                handleSpanStyleStart(
+                    SpanStyle(
+                        color = color,
+                        background = background,
+                        fontFamily = FontFamily.Monospace
+                    )
+                )
+            }
+            "a" -> withColors(attributes) { color, background ->
+                handleAnchorStart(attributes("href").orEmpty(), color, background)
+            }
+            "u" -> withColors(attributes) { color, background ->
+                handleSpanStyleStart(
+                    SpanStyle(
+                        color = color,
+                        background = background,
+                        textDecoration = TextDecoration.Underline
+                    )
+                )
+            }
+            "del", "s", "strike" -> withColors(attributes) { color, background ->
+                handleSpanStyleStart(
+                    SpanStyle(
+                        color = color,
+                        background = background,
+                        textDecoration = TextDecoration.LineThrough
+                    )
+                )
+            }
+            "sup" -> withColors(attributes) { color, background ->
+                handleSpanStyleStart(
+                    SpanStyle(
+                        color = color,
+                        background = background,
+                        baselineShift = BaselineShift.Superscript
+                    )
+                )
+            }
+            "sub" -> withColors(attributes) { color, background ->
+                handleSpanStyleStart(
+                    SpanStyle(
+                        color = color,
+                        background = background,
+                        baselineShift = BaselineShift.Subscript
+                    )
+                )
+            }
+            "span" -> if (style.isTextColorEnabled) {
+                withColors(attributes) { color, background ->
+                    handleSpanStyleStart(SpanStyle(color = color, background = background))
+                }
+            }
             "h1", "h2", "h3", "h4", "h5", "h6" -> handleHeadingStart(name)
             "script", "head", "table", "form", "fieldset" -> handleSkippedTagStart()
         }
@@ -211,8 +289,8 @@ internal class AnnotatedStringHtmlHandler(
         return if (level == 1) FontWeight.Bold else FontWeight.Black
     }
 
-    private fun handleBoldStart() {
-        handleSpanStyleStart(SpanStyle(fontWeight = incrementBoldLevel()))
+    private fun handleBoldStart(color: Color, background: Color) {
+        handleSpanStyleStart(SpanStyle(color = color, background = background, fontWeight = incrementBoldLevel()))
     }
 
     private fun handleSpanStyleStart(style: SpanStyle) {
@@ -220,11 +298,23 @@ internal class AnnotatedStringHtmlHandler(
         pendingSpanStyles.add(style)
     }
 
-    private fun handleAnchorStart(url: String) {
+    private fun handleAnchorStart(url: String, color: Color, background: Color) {
+        // Merge colors with TextLinkStyles
+        val configTextLinkStyles = style.textLinkStyles
+        val textLinkStyles = if (color.isUnspecified && background.isUnspecified) {
+            configTextLinkStyles
+        } else {
+            TextLinkStyles(
+                style = SpanStyle(color = color, background = background).merge(configTextLinkStyles?.style),
+                focusedStyle = configTextLinkStyles?.focusedStyle,
+                hoveredStyle = configTextLinkStyles?.hoveredStyle,
+                pressedStyle = configTextLinkStyles?.pressedStyle
+            )
+        }
         builder.pushLink(
             LinkAnnotation.Url(
                 url = url,
-                styles = style.textLinkStyles,
+                styles = textLinkStyles,
                 linkInteractionListener = linkInteractionListener
             )
         )
@@ -269,6 +359,7 @@ internal class AnnotatedStringHtmlHandler(
             "del", "s", "strike",
             "sup",
             "sub" -> handleSpanStyleEnd()
+            "span" -> if (style.isTextColorEnabled) handleSpanStyleEnd()
             "a" -> handleAnchorEnd()
             "h1", "h2", "h3", "h4", "h5", "h6" -> handleHeadingEnd()
             "script", "head", "table", "form", "fieldset" -> handleSkippedTagEnd()
