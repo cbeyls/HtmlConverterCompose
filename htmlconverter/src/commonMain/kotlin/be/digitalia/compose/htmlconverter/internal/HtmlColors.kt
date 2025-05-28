@@ -388,7 +388,7 @@ internal fun getHtmlColor(value: String): Color {
     }
 }
 
-private val COLOR_STYLE_REGEX = Regex("(?:^|;)\\s*color\\s*:\\s*(.*?)(?:$|\\s|;)")
+private val COLOR_STYLE_REGEX = Regex("(?:^|;)\\s*color\\s*:\\s*(.*?)(?:$|\\s|;)", RegexOption.IGNORE_CASE)
 
 internal fun getColorFromStyle(style: String): Color {
     val matchResult = COLOR_STYLE_REGEX.find(style)
@@ -399,7 +399,8 @@ internal fun getColorFromStyle(style: String): Color {
     }
 }
 
-private val BACKGROUND_COLOR_STYLE_REGEX = Regex("(?:^|;)\\s*background(?:-color)?\\s*:\\s*(.*?)(?:$|\\s|;)")
+private val BACKGROUND_COLOR_STYLE_REGEX =
+    Regex("(?:^|;)\\s*background(?:-color)?\\s*:\\s*(.*?)(?:$|\\s|;)", RegexOption.IGNORE_CASE)
 
 internal fun getBackgroundColorFromStyle(style: String): Color {
     val matchResult = BACKGROUND_COLOR_STYLE_REGEX.find(style)
