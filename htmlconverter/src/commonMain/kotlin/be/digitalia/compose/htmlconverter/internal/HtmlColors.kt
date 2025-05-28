@@ -312,23 +312,42 @@ private fun getColorByName(colorName: String): Color {
     return if (index < 0) Color.Unspecified else Color(COLOR_VALUES[index].toLong() or 0xFF000000L)
 }
 
+private val Char.hexDigitValue: Int
+    get() = when (this) {
+        in '0'..'9' -> this - '0'
+        in 'a'..'f' -> this - 'a' + 10
+        in 'A'..'F' -> this - 'A' + 10
+        else -> throw IllegalArgumentException("Invalid hex digit")
+    }
+
+private fun String.parseHexToInt(): Int {
+    val l = length
+    require(l in 2..9) { "Invalid number of hex digits" }
+    var result = 0
+    // Start at position 1 (skip the '#')
+    for (i in 1..<l) {
+        result = (result shl 4) or this[i].hexDigitValue
+    }
+    return result
+}
+
 /**
  * Transform color from RRGGBBAA to AARRGGBB format
  */
-private fun swapColorAlpha(colorValue: Long): Long {
-    val alpha = colorValue and 0xFFL
+private fun swapColorAlpha(colorValue: Int): Int {
+    val alpha = colorValue and 0xFF
     return (colorValue ushr 8) or (alpha shl 24)
 }
 
 /**
  * Transform color from RGB to RRGGBB format or from RGBA to RRGGBBAA format
  */
-private fun expandColor(colorValue: Long, length: Int): Long {
+private fun expandColor(colorValue: Int, length: Int): Int {
     var remainingValue = colorValue
     var maskPosition = 0
-    var result = 0L
+    var result = 0
     repeat(length) {
-        val component = remainingValue and 0xFL
+        val component = remainingValue and 0xF
         result = result or (component shl maskPosition)
         maskPosition += 4
         result = result or (component shl maskPosition)
@@ -338,27 +357,19 @@ private fun expandColor(colorValue: Long, length: Int): Long {
     return result
 }
 
-@OptIn(ExperimentalStdlibApi::class)
-private val colorHexFormat = HexFormat {
-    number {
-        prefix = "#"
-    }
-}
-
-@OptIn(ExperimentalStdlibApi::class)
 private fun String.hexToColor(): Color {
     val colorValue = try {
-        hexToLong(colorHexFormat)
+        parseHexToInt()
     } catch (_: IllegalArgumentException) {
         return Color.Unspecified
     }
     return when (length) {
         // #RRGGBB
-        7 -> Color(colorValue or 0xFF000000L)
+        7 -> Color(colorValue or 0xFF000000.toInt())
         // #RRGGBBAA
         9 -> Color(swapColorAlpha(colorValue))
         // #RGB
-        4 -> Color(expandColor(colorValue, 3) or 0xFF000000L)
+        4 -> Color(expandColor(colorValue, 3) or 0xFF000000.toInt())
         // #RGBA
         5 -> Color(swapColorAlpha(expandColor(colorValue, 4)))
         else -> Color.Unspecified
