@@ -7,6 +7,36 @@ on:
     branches: [ "main" ]
 
 jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: jvm
+            os: ubuntu
+          - target: js
+            os: ubuntu
+          - target: wasmJs
+            os: ubuntu
+          - target: macosArm64
+            os: macos
+          - target: iosSimulatorArm64
+            os: macos
+    runs-on: "${{ matrix.os }}-latest"
+    name: "test (${{ matrix.target }})"
+    steps:
+      - name: Check out code
+        uses: "actions/checkout@v4"
+
+      - name: Set up JDK 21
+        uses: "actions/setup-java@v4"
+        with:
+          distribution: "temurin"
+          java-version: 21
+
+      - name: Test with Gradle
+        run: "./gradlew :htmlconverter:${{ matrix.target }}Test"
+
   build:
     runs-on: ubuntu-latest
 
