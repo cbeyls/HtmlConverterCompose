@@ -305,11 +305,15 @@ private val COLOR_VALUES = intArrayOf(
 )
 
 /**
- * Return the matching color if present in the color names list or Color.Unspecified if absent.
+ * Return the matching color if present in the CSS named colors list or Color.Unspecified if absent.
  */
 private fun getColorByName(colorName: String): Color {
     val index = COLOR_NAMES.binarySearch(colorName, String.CASE_INSENSITIVE_ORDER)
-    return if (index < 0) Color.Unspecified else Color(COLOR_VALUES[index].toLong() or 0xFF000000L)
+    return if (index >= 0) {
+        Color(COLOR_VALUES[index].toLong() or 0xFF000000L)
+    } else {
+        if (colorName.equals("transparent", ignoreCase = true)) Color.Transparent else Color.Unspecified
+    }
 }
 
 private val Char.hexDigitValue: Int
