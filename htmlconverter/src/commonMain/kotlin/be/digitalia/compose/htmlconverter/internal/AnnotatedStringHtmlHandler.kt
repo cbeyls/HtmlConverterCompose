@@ -304,11 +304,12 @@ internal class AnnotatedStringHtmlHandler(
         val textLinkStyles = if (color.isUnspecified && background.isUnspecified) {
             configTextLinkStyles
         } else {
+            val overrideColorStyle = SpanStyle(color = color, background = background)
             TextLinkStyles(
-                style = SpanStyle(color = color, background = background).merge(configTextLinkStyles?.style),
-                focusedStyle = configTextLinkStyles?.focusedStyle,
-                hoveredStyle = configTextLinkStyles?.hoveredStyle,
-                pressedStyle = configTextLinkStyles?.pressedStyle
+                style = configTextLinkStyles?.style?.merge(overrideColorStyle) ?: overrideColorStyle,
+                focusedStyle = configTextLinkStyles?.focusedStyle?.merge(overrideColorStyle),
+                hoveredStyle = configTextLinkStyles?.hoveredStyle?.merge(overrideColorStyle),
+                pressedStyle = configTextLinkStyles?.pressedStyle?.merge(overrideColorStyle)
             )
         }
         builder.pushLink(
