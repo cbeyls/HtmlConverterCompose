@@ -22,11 +22,12 @@ fun App() {
         val linkColor = MaterialTheme.colors.primary
         val convertedText = remember(linkColor) {
             htmlToAnnotatedString(
-                SampleHtml().get(),
+                SampleHtml,
                 style = HtmlStyle(
                     textLinkStyles = TextLinkStyles(
                         style = SpanStyle(color = linkColor)
-                    )
+                    ),
+                    isTextColorEnabled = true
                 )
             )
         }
