@@ -26,14 +26,18 @@ import androidx.compose.ui.unit.sp
 public data class HtmlStyle(
     /**
      * Optional style for hyperlinks (<a> tags). Default is a simple underline.
-      */
+     */
     val textLinkStyles: TextLinkStyles? = TextLinkStyles(
         style = SpanStyle(textDecoration = TextDecoration.Underline)
     ),
     /**
      * Unit of indentation for block quotations and nested lists. Default is 24 sp.
      */
-    val indentUnit: TextUnit = 24.sp
+    val indentUnit: TextUnit = 24.sp,
+    /**
+     * Enable support for text foreground and background color using CSS inline styles. Default is disabled.
+     */
+    val isTextColorEnabled: Boolean = false
 ) {
     public companion object {
         public val DEFAULT: HtmlStyle = HtmlStyle()

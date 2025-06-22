@@ -9,9 +9,9 @@ It can be considered as a multiplatform replacement for Android's [`Html.fromHtm
 
 | Platform                | Supported |
 |-------------------------|-----------|
-| JVM (Android & Desktop) | ✅        |
-| Native (iOS & macOS)    | ✅        |
-| Web (JS & WASM)         | ✅        |
+| JVM (Android & Desktop) | ✅         |
+| Native (iOS & macOS)    | ✅         |
+| Web (JS & WASM)         | ✅         |
 
 ## Running the sample app
 
@@ -87,8 +87,9 @@ Both functions take an optional `compactMode` boolean argument. When set to `tru
 
 The `htmlToAnnotatedString()` function takes an optional `style` argument of type `HtmlStyle` which allows to customize styling. The currently provided options are:
 
-- `textLinkStyles`: Optional collection of styles for hyperlinks (content of `a` tags). Default is a simple underline. When set to `null`, hyperlinks will not be styled, which can be useful when they are not clickable (see next section).
+- `textLinkStyles`: Optional collection of styles for hyperlinks (content of `a` tags). Default is a simple underline. When set to `null`, hyperlinks will not be styled, which can be useful when they are not clickable (see following section).
 - `indentUnit`: Unit of indentation for block quotations and nested lists. Default is **24 sp**. Note that `em` units are not yet supported for indentation in Compose Desktop. Set to `0.sp` or `TextUnit.Unspecified` to disable indentation support.
+- `isTextColorEnabled`: Enable CSS colored text support (see next section).
 
 For example, here is how to style hyperlinks to use the theme's primary color with no underline:
 
@@ -108,6 +109,35 @@ Text(
     text = convertedText,
     modifier = Modifier.fillMaxWidth()
 )
+```
+
+### Colored text
+
+Support for CSS colored text is disabled by default in order to guarantee good contrast and respect of the Compose theme colors for unsanitized HTML input. To enable CSS colored text, set the `isTextColorEnabled` option to `true` in the `HtmlStyle` argument:
+
+```kotlin
+val convertedText = remember(html) {
+    htmlToAnnotatedString(
+        html,
+        style = HtmlStyle(isTextColorEnabled = true)
+    )
+}
+Text(
+    text = convertedText,
+    maxLines = 3
+)
+```
+
+- Text coloring is available for supported HTML **inline** tags only, through the CSS `"style"` attribute: `span`, `strong`, `b`, `em`, `cite`, `dfn`, `i`, `big`, `small`, `tt`, `code`, `a`, `u`, `del`, `s`, `strike`, `sup`, `sub`.
+- Both foreground (`color`) and background (`background`, `background-color`) CSS properties are supported.
+- All [CSS level 4 named colors](https://www.w3.org/TR/css-color-4/#named-colors) (case insensitive) and all hexadecimal RGB color definitions (`#RRGGBB`, `#RRGGBBAA`, `#RGB`, `#RGBA`) are supported.
+- Other color formats like `rgb(...)`, `rgba(...)`, `hsl(...)` and `hsla(...)` are **not** supported.
+- If a CSS color property is defined on a hyperlink or on a tag inside a hyperlink, it will override any color defined in `textLinkStyles`.  
+
+Example of supported CSS color styling:
+
+```html
+<span style="color: darkred; background-color: #FFFF0099">Red over translucent yellow</span>
 ```
 
 ### Handling hyperlink clicks
@@ -133,13 +163,15 @@ Text(
 )
 ```
 
-### Bug when showing hyperlinks in combination with maxLines
+### Bug when showing hyperlinks in combination with maxLines in Compose 1.7
 
-Compose UI 1.7.x has an unsolved bug which triggers a crash when a `Text` composable using `maxLines` is displaying an `AnnotatedString` containing a `LinkAnnotation` inside a paragraph.
+Compose UI versions 1.7.0 to 1.7.6 have a bug which triggers a crash when a `Text` composable using `maxLines` is displaying an `AnnotatedString` containing a `LinkAnnotation` inside a paragraph.
 
 This library is vulnerable to that bug because it uses both `LinkAnnotation` to display hyperlinks and paragraphs to handle text indentation.
 
-As a workaround, you can disable indentation support in `Text` composables which require the usage of `maxLines`:
+It is recommended to upgrade to Compose 1.8.0 or more recent to avoid the issue.
+
+If you are still using Compose 1.7.x along with an older version of this library, as a workaround, you can disable indentation support in `Text` composables which require the usage of `maxLines`:
 
 ```kotlin
 val convertedText = remember(html) {
@@ -158,7 +190,7 @@ See related bug reports [374115892](https://issuetracker.google.com/issues/37411
 
 ### Custom parsing
 
-The `htmlToAnnotatedString()` and `htmlToString()` functions provide an overload that accepts an `HTMLParser` first argument in place of a `String`.
+The `htmlToAnnotatedString()` and `htmlToString()` functions provide an overload that accepts a `HTMLParser` first argument in place of a `String`.
 
 `HTMLParser` is an interface that you may implement to provide your own parser, in case the HTML is not directly available as a `String` (for example as a character stream or encoded using a binary format).
 
@@ -166,7 +198,7 @@ The default implementation uses the [KtXml](https://github.com/kobjects/ktxml) m
 
 ## Supported HTML tags
 
-- Inline tags with styling: `strong`, `b` (**bold**), `em`, `cite`, `dfn`, `i` (*italic*), `big` (bigger text), `small` (smaller text), `tt`, `code` (`monospace font`), `a` ([hyperlink](#supported-html-tags)), `u` (underline), `del`, `s`, `strike` (~~strikethrough~~), `sup` (<sup>supertext</sup>), `sub` (<sub>subtext</sub>)
+- Inline tags with styling: `strong`, `b` (**bold**), `em`, `cite`, `dfn`, `i` (*italic*), `big` (bigger text), `small` (smaller text), `tt`, `code` (`monospace font`), `a` ([hyperlink](#supported-html-tags)), `u` (underline), `del`, `s`, `strike` (~~strikethrough~~), `sup` (<sup>supertext</sup>), `sub` (<sub>subtext</sub>), `span` (CSS colors only through the "style" attribute)
 - Block tags (paragraphs): `p`, `blockquote`, `pre` (including `monospace font`), `div`, `header`, `footer`, `main`, `nav`, `aside`, `section`, `article`, `address`, `figure`, `figcaption`, `video`, `audio` (no player shown, only inline text)
 - Horizontal rule: `hr` (no line drawn, but marks a new paragraph)
 - Lists: `ul`, `ol`, `li`, `dl`, `dt`, `dd`
