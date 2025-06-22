@@ -67,10 +67,7 @@ sourceSets {
 To display styled HTML in a Text composable:
 
 ```kotlin
-Text(
-    text = remember(html) { htmlToAnnotatedString(html) },
-    modifier = Modifier.fillMaxWidth()
-)
+Text(text = remember(html) { htmlToAnnotatedString(html) })
 ```
 
 > If called from inside a `@Composable` function, in most cases it is recommended to use `remember()` to cache the result of the conversion, to avoid recomputation on each recomposition.
@@ -105,10 +102,7 @@ val convertedText = remember(html, linkColor) {
         )
     )
 }
-Text(
-    text = convertedText,
-    modifier = Modifier.fillMaxWidth()
-)
+Text(text = convertedText)
 ```
 
 ### Colored text
@@ -122,10 +116,7 @@ val convertedText = remember(html) {
         style = HtmlStyle(isTextColorEnabled = true)
     )
 }
-Text(
-    text = convertedText,
-    maxLines = 3
-)
+Text(text = convertedText)
 ```
 
 - Text coloring is available for supported HTML **inline** tags only, through the CSS `"style"` attribute: `span`, `strong`, `b`, `em`, `cite`, `dfn`, `i`, `big`, `small`, `tt`, `code`, `a`, `u`, `del`, `s`, `strike`, `sup`, `sub`.
@@ -157,10 +148,7 @@ val convertedText = remember(html) {
         }
     )
 }
-Text(
-    text = convertedText,
-    modifier = Modifier.fillMaxWidth()
-)
+Text(text = convertedText)
 ```
 
 ### Bug when showing hyperlinks in combination with maxLines in Compose 1.7
