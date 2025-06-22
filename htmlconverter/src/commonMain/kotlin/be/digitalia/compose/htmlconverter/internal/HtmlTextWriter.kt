@@ -85,8 +85,7 @@ internal class HtmlTextWriter(
                 currentState = STATE_CONTENT_IN_PROGRESS
                 break
             }
-            output.append(text, contentStartIndex, index)
-            output.append(' ')
+            output.append(text, contentStartIndex, index).append(' ')
             state = STATE_SPACE_IN_PROGRESS
             index++
         }
@@ -128,7 +127,7 @@ internal class HtmlTextWriter(
         }
         pendingIndentCount.let { indentCount ->
             if (indentCount > 0) {
-                for (i in 1..indentCount) {
+                repeat(indentCount) {
                     output.append("    ")
                 }
                 pendingIndentCount = 0
