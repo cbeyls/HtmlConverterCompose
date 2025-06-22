@@ -1,6 +1,18 @@
 Change Log
 ==========
 
+## Version 1.1.0
+
+_2025-06-23_
+
+New features:
+- Opt-in support for CSS foreground and background text colors (#15) with the help of @mimai-hen
+- Javascript, WASM (experimental) and native MacOS (experimental) support (#14) thanks to @sargunv.
+
+This release depends on:
+- Kotlin **2.1.21**
+- Compose Multiplatform **1.8.0** (Jetpack Compose UI **1.8.0**)
+
 ## Version 1.0.4
 
 _2025-05-04_
