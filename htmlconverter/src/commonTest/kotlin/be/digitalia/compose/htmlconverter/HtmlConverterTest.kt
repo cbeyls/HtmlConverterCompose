@@ -1,9 +1,12 @@
 package be.digitalia.compose.htmlconverter
 
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -56,5 +59,30 @@ class HtmlConverterTest {
         }
 
         assertEquals(expected, htmlToAnnotatedString(html))
+    }
+
+    @Test
+    fun textColorTest() {
+        // language=html
+        val html = """
+            <span style="color:red;">Open<b>Fr<i style="color:#001F00   ;">e</i>e</b>Map</span>
+        """.trimIndent().trim()
+
+        val expected = buildAnnotatedString {
+            pushStyle(SpanStyle(color = Color(255, 0, 0)))
+            append("Open")
+            pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
+            append("Fr")
+            pushStyle(SpanStyle(color = Color(0, 31, 0), fontStyle = FontStyle.Italic))
+            append("e")
+            pop()
+            append("e")
+            pop()
+            append("Map")
+            pop()
+        }
+
+        val actual = htmlToAnnotatedString(html, style = HtmlStyle(isTextColorEnabled = true))
+        assertEquals(expected, actual)
     }
 }
