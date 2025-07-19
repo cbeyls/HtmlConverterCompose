@@ -122,7 +122,7 @@ Text(text = convertedText)
 - Text coloring is available for supported HTML **inline** tags only, through the CSS `"style"` attribute: `span`, `strong`, `b`, `em`, `cite`, `dfn`, `i`, `big`, `small`, `tt`, `code`, `a`, `u`, `del`, `s`, `strike`, `sup`, `sub`.
 - Both foreground (`color`) and background (`background`, `background-color`) CSS properties are supported.
 - All [CSS level 4 named colors](https://www.w3.org/TR/css-color-4/#named-colors) (case insensitive) and all hexadecimal RGB color definitions (`#RRGGBB`, `#RRGGBBAA`, `#RGB`, `#RGBA`) are supported.
-- Other color formats like `rgb(...)`, `rgba(...)`, `hsl(...)` and `hsla(...)` are **not** supported.
+- Other sRGB color formats like `rgb(...)`, `rgba(...)`, `hsl(...)` and `hsla(...)` are supported, contrary to newer ones (e.g. `lab(...)`, `oklch(...)`).
 - If a CSS color property is defined on a hyperlink or on a tag inside a hyperlink, it will override any color defined in `textLinkStyles`.  
 
 Example of supported CSS color styling:

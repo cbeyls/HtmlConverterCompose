@@ -85,4 +85,29 @@ class HtmlConverterTest {
         val actual = htmlToAnnotatedString(html, style = HtmlStyle(isTextColorEnabled = true))
         assertEquals(expected, actual)
     }
+
+    @Test
+    fun textColorFunctionsTest() {
+        // language=html
+        val html = """
+            <span style="color: hsl(0, 100%, 50%);">Open<b style="color: hwb(195 0% 0%)">Fr<i style="color: rgb(255, 0, 255, 0.6)   ;">e</i>e</b>Map</span>
+        """.trimIndent().trim()
+
+        val expected = buildAnnotatedString {
+            pushStyle(SpanStyle(color = Color(255, 0, 0)))
+            append("Open")
+            pushStyle(SpanStyle(color = Color(0, 191, 255), fontWeight = FontWeight.Bold))
+            append("Fr")
+            pushStyle(SpanStyle(color = Color(255, 0, 255, 153), fontStyle = FontStyle.Italic))
+            append("e")
+            pop()
+            append("e")
+            pop()
+            append("Map")
+            pop()
+        }
+
+        val actual = htmlToAnnotatedString(html, style = HtmlStyle(isTextColorEnabled = true))
+        assertEquals(expected, actual)
+    }
 }
