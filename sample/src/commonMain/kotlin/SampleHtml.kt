@@ -27,6 +27,12 @@ val SampleHtml
                         <li>Item 2</li>
                     </ol>
                 </li>
+                <li>A nested unordered list:
+                    <ul>
+                        <li>Item 1</li>
+                        <li>Item 2</li>
+                    </ul>
+                </li>
             </ul>
 
             <dl>

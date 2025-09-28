@@ -261,12 +261,18 @@ internal class AnnotatedStringHtmlHandler(
             listIndexes[currentListLevel - 1]
         }
         if (itemIndex < 0) {
-            textWriter.write("• ")
+            textWriter.write(getBulletString(currentListLevel))
         } else {
             textWriter.write(itemIndex.toString())
             textWriter.write(". ")
             listIndexes[currentListLevel - 1] = itemIndex + 1
         }
+    }
+
+    private fun getBulletString(listLevel: Int): String = when (listLevel) {
+        0, 1 -> "• "
+        2 -> "◦ "
+        else -> "▪ "
     }
 
     private fun handleDefinitionTermStart() {
