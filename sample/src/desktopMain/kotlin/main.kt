@@ -11,6 +11,6 @@ fun main() = application {
 
 @Preview
 @Composable
-fun AppDesktopPreview() {
+private fun AppDesktopPreview() {
     App()
 }

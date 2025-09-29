@@ -21,6 +21,6 @@ class MainActivity : ComponentActivity() {
 
 @Preview(showSystemUi = true)
 @Composable
-fun AppAndroidPreview() {
+private fun AppAndroidPreview() {
     App()
 }
