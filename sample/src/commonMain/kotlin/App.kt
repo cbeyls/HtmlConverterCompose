@@ -11,6 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.unit.dp
 import be.digitalia.compose.htmlconverter.HtmlStyle
 import be.digitalia.compose.htmlconverter.htmlToAnnotatedString
@@ -41,7 +42,9 @@ fun App() {
                 modifier = Modifier
                     .fillMaxSize()
                     .safeDrawingPadding(),
-                style = MaterialTheme.typography.body1
+                style = MaterialTheme.typography.body1.copy(
+                    lineBreak = LineBreak.Paragraph
+                )
             )
         }
     }
