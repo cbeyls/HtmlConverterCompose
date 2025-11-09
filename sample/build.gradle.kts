@@ -55,12 +55,12 @@ kotlin {
 
 android {
     namespace = "be.digitalia.compose.htmlconverter.sample"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "be.digitalia.compose.htmlconverter.sample"
         minSdk = 21
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0.0"
     }
