@@ -17,8 +17,8 @@ It can be considered as a multiplatform replacement for Android's [`Html.fromHtm
 
 #### Android
 
-* Open the project in Android Studio and click ▶ **sample** (run configuration) to build and run.
-* _OR_ from the command line: `./gradlew sample:installDebug` to install to a connected device.
+* Open the project in Android Studio and click ▶ **androidApp** (run configuration) to build and run.
+* _OR_ from the command line: `./gradlew androidApp:installDebug` to install to a connected device.
 
 #### Desktop (JVM)
 

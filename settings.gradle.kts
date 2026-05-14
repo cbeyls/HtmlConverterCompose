@@ -15,4 +15,4 @@ dependencyResolutionManagement {
 rootProject.name = "HtmlConverterCompose"
 include(":htmlconverter")
 include(":sample")
-include(":androidsample")
+include(":androidApp")
