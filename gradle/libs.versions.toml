@@ -1,7 +1,7 @@
 [versions]
 androidGradlePlugin = "8.13.0"
 androidx-activity-compose = "1.11.0"
-jetbrainsCompose = "1.8.0"
+jetbrainsCompose = "1.9.3"
 kotlin = "2.2.21"
 ktxml = "1.0.0"
 maven-publish = "0.36.0"
@@ -12,7 +12,7 @@ ktxml = { module = "org.kobjects.ktxml:core", version.ref = "ktxml" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
-android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
+android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "androidGradlePlugin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "jetbrainsCompose" }

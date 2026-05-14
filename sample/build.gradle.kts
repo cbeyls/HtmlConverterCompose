@@ -3,13 +3,17 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.android.library)
+    alias(libs.plugins.android.kotlin.multiplatform.library)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
 }
 
 kotlin {
-    androidTarget {
+    android {
+        namespace = "be.digitalia.compose.htmlconverter.sample.shared"
+        compileSdk = 36
+        minSdk = 21
+
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_11)
         }
@@ -26,10 +30,10 @@ kotlin {
         }
     }
 
-    jvm("desktop")
+    jvm()
 
     sourceSets {
-        val commonMain by getting {
+        commonMain {
             dependencies {
                 implementation(project(":htmlconverter"))
                 implementation(compose.runtime)
@@ -39,24 +43,11 @@ kotlin {
                 implementation(compose.components.uiToolingPreview)
             }
         }
-        val desktopMain by getting {
+        jvmMain {
             dependencies {
                 implementation(compose.desktop.currentOs)
             }
         }
-    }
-}
-
-android {
-    namespace = "be.digitalia.compose.htmlconverter.sample.shared"
-    compileSdk = 36
-
-    defaultConfig {
-        minSdk = 21
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
     }
 }
 
