@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidApplication)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
 }
@@ -29,12 +29,6 @@ kotlin {
     jvm("desktop")
 
     sourceSets {
-        val androidMain by getting {
-            dependencies {
-                implementation(compose.preview)
-                implementation(libs.androidx.activity.compose)
-            }
-        }
         val commonMain by getting {
             dependencies {
                 implementation(project(":htmlconverter"))
@@ -54,38 +48,15 @@ kotlin {
 }
 
 android {
-    namespace = "be.digitalia.compose.htmlconverter.sample"
+    namespace = "be.digitalia.compose.htmlconverter.sample.shared"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "be.digitalia.compose.htmlconverter.sample"
         minSdk = 21
-        targetSdk = 36
-        versionCode = 1
-        versionName = "1.0.0"
-    }
-    buildTypes {
-        release {
-            isMinifyEnabled = true
-            isShrinkResources = true
-        }
-        packaging {
-            resources {
-                excludes += listOf(
-                    "DebugProbesKt.bin",
-                    "kotlin-tooling-metadata.json",
-                    "kotlin/**",
-                    "META-INF/*.version"
-                )
-            }
-        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
-    }
-    dependencies {
-        debugImplementation(compose.uiTooling)
     }
 }
 
