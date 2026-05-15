@@ -1,6 +1,17 @@
 Change Log
 ==========
 
+## Version 1.1.1
+
+_2026-05-15_
+
+New feature:
+- Use a different bullet character depending on the nesting level for unordered lists.
+
+This release depends on:
+- Kotlin **2.2.21**
+- Compose Multiplatform **1.9.3** (Jetpack Compose UI **1.9.4**)
+
 ## Version 1.1.0
 
 _2025-06-23_
