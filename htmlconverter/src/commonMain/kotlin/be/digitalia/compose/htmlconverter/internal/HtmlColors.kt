@@ -1,6 +1,7 @@
 package be.digitalia.compose.htmlconverter.internal
 
 import androidx.compose.ui.graphics.Color
+import kotlin.math.roundToInt
 
 private val COLOR_NAMES = listOf(
     "AliceBlue",
@@ -385,31 +386,120 @@ internal fun getHtmlColor(value: String): Color {
         return Color.Unspecified
     }
     val firstChar = value[0]
+    val lastChar = value[value.lastIndex]
     return when {
         firstChar == '#' -> value.hexToColor()
+        lastChar == ')' -> getColorFromFunction(value)
         firstChar.isLetter() -> getColorByName(value)
         else -> Color.Unspecified
     }
 }
 
-private val COLOR_STYLE_REGEX = Regex("(?:^|;)\\s*color\\s*:\\s*(.*?)(?:$|\\s|;)", RegexOption.IGNORE_CASE)
+// language=regexp
+private const val NAME = "\\s*(\\w+)\\s*"
+// language=regexp
+private const val VALUE = "\\s*([\\w.%]+)\\s*"
+private val COMMA_REGEX = Regex("$NAME\\($VALUE,$VALUE,$VALUE(?:,$VALUE)?\\)")
+private val WS_REGEX = Regex("$NAME\\($VALUE\\s$VALUE\\s$VALUE(?:/$VALUE)?\\)")
+
+internal fun getColorFromFunction(color: String): Color {
+    val match = COMMA_REGEX.find(color) ?: WS_REGEX.find(color)
+    if (match == null) return Color.Unspecified
+
+    val name = match.groupValues[1]
+    val values = match.groupValues.drop(2)
+    return when(name) {
+        "rgb", "rgba" -> colorFromRgb(values)
+        "hsl", "hsla" -> colorFromHsl(values)
+        "hwb" -> colorFromHwb(values)
+        else -> TODO("other methods not implemented")
+    }
+}
+
+private fun colorFromRgb(values: List<String>): Color {
+    if (values.size < 3 || values.size > 4) return Color.Unspecified
+    val alpha = if (values.size == 4 && values[3].isNotBlank()) getFloatFromPct(values[3]) else 1.0f
+    val r = getIntFromPct(values[0])
+    val g = getIntFromPct(values[1])
+    val b = getIntFromPct(values[2])
+    val roundedAlpha = (alpha * 255).roundToInt()
+    return Color(r, g, b, roundedAlpha)
+}
+
+private fun colorFromHsl(values: List<String>): Color {
+    if (values.size < 3 || values.size > 4) return Color.Unspecified
+    val alpha = if (values.size == 4 && values[3].isNotBlank()) getFloatFromPct(values[3]) else 1.0f
+    val h = getDegree(values[0])
+    val s = getFloatFromPct(values[1])
+    val l = getFloatFromPct(values[2])
+    return Color.hsl(h, s, l, alpha)
+}
+
+private fun colorFromHwb(values: List<String>): Color {
+    if (values.size < 3 || values.size > 4) return Color.Unspecified
+    val alpha = if (values.size == 4 && values[3].isNotBlank()) getFloatFromPct(values[3]) else 1.0f
+    val h = getDegree(values[0])
+    val w = getFloatFromPct(values[1])
+    val b = getFloatFromPct(values[2])
+    return convertHwbToColor(h, w, b, alpha)
+}
+
+private fun convertHwbToColor(h: Float, w: Float, b: Float, alpha: Float): Color {
+    fun componentConvertHslToHwb(hsl: Float) = hsl * (1 - w - b) + w
+    if(w + b >= 1) {
+        val gray = w / (w + b)
+        return Color(gray, gray, gray, alpha)
+    }
+    val color = Color.hsl(h, 1f, 0.5f)
+    val red = componentConvertHslToHwb(color.red)
+    val green = componentConvertHslToHwb(color.green)
+    val blue = componentConvertHslToHwb(color.blue)
+    return Color(red, green, blue, alpha)
+}
+
+private fun getFloatFromPct(s: String): Float {
+    return if (s.last() == '%')
+        s.slice(0..s.lastIndex-1).toFloat() / 100
+    else s.toFloat()
+}
+
+private fun getIntFromPct(s: String): Int {
+    return if (s.last() == '%')
+        (s.slice(0..s.lastIndex-1).toFloat() * 255).roundToInt()
+    else s.toInt()
+}
+
+private val DEGREE_REGEX = Regex("\\s*([\\d.-]+)([a-z]*)")
+
+private fun getDegree(s: String): Float {
+    val matchResult = DEGREE_REGEX.find(s)
+    if (matchResult== null)
+        error("$s is not a proper pct")
+    val value = matchResult.groupValues[1].toFloat()
+    val type = matchResult.groupValues[2]
+    return if (type.isEmpty() || type == "deg")
+        value
+    else
+        value * 360
+}
+private val COLOR_STYLE_REGEX = Regex("(?:^|;)\\s*color\\s*:\\s*(.*?)(?:$|;)", RegexOption.IGNORE_CASE)
 
 internal fun getColorFromStyle(style: String): Color {
     val matchResult = COLOR_STYLE_REGEX.find(style)
     return if (matchResult != null) {
-        getHtmlColor(matchResult.groupValues[1])
+        getHtmlColor(matchResult.groupValues[1].trimEnd())
     } else {
         Color.Unspecified
     }
 }
 
 private val BACKGROUND_COLOR_STYLE_REGEX =
-    Regex("(?:^|;)\\s*background(?:-color)?\\s*:\\s*(.*?)(?:$|\\s|;)", RegexOption.IGNORE_CASE)
+    Regex("(?:^|;)\\s*background(?:-color)?\\s*:\\s*(.*?)(?:$|;)", RegexOption.IGNORE_CASE)
 
 internal fun getBackgroundColorFromStyle(style: String): Color {
     val matchResult = BACKGROUND_COLOR_STYLE_REGEX.find(style)
     return if (matchResult != null) {
-        getHtmlColor(matchResult.groupValues[1])
+        getHtmlColor(matchResult.groupValues[1].trimEnd())
     } else {
         Color.Unspecified
     }
