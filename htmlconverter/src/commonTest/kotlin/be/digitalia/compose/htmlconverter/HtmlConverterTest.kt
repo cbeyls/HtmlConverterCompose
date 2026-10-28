@@ -57,4 +57,23 @@ class HtmlConverterTest {
 
         assertEquals(expected, htmlToAnnotatedString(html))
     }
+
+    @Test
+    fun nonBreakingSpacesArePreserved() {
+        assertEquals("© OpenStreetMap", htmlToString("©&nbsp;OpenStreetMap"))
+        assertEquals("© OpenStreetMap", htmlToString("©&#160;OpenStreetMap"))
+        assertEquals("© OpenStreetMap", htmlToString("© OpenStreetMap"))
+        assertEquals("a   b", htmlToString("a &nbsp; b"))
+    }
+
+    @Test
+    fun unicodeSpacesArePreserved() {
+        assertEquals("1 000", htmlToString("1&thinsp;000"))
+        assertEquals("東京　都", htmlToString("東京　都"))
+    }
+
+    @Test
+    fun asciiWhitespaceIsCollapsed() {
+        assertEquals("a b c d e", htmlToString("a \t b\n\nc\r\n d\u000C e"))
+    }
 }

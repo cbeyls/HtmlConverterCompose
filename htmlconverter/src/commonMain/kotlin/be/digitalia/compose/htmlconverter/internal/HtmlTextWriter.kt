@@ -60,7 +60,7 @@ internal class HtmlTextWriter(
         var contentStart = true
         var index = 0
         while (true) {
-            val contentStartIndex = text.indexOfFirst(index) { !it.isWhitespace() }
+            val contentStartIndex = text.indexOfFirst(index) { !it.isHtmlWhitespace() }
             // Add a single space after content if at least one leading whitespace is detected
             if (state == STATE_CONTENT_IN_PROGRESS && contentStartIndex != index) {
                 contentStart = false
@@ -78,7 +78,7 @@ internal class HtmlTextWriter(
                 callbacks?.onWriteContentStart()
             }
 
-            index = text.indexOfFirst(contentStartIndex + 1) { it.isWhitespace() }
+            index = text.indexOfFirst(contentStartIndex + 1) { it.isHtmlWhitespace() }
             if (index == -1) {
                 // No spaces left, write remaining content
                 output.append(text, contentStartIndex, text.length)
@@ -113,6 +113,12 @@ internal class HtmlTextWriter(
         }
         return -1
     }
+
+    /**
+     * The whitespace characters defined by HTML. No-break and other Unicode spaces are kept as written.
+     */
+    private fun Char.isHtmlWhitespace(): Boolean =
+        this == ' ' || this == '\t' || this == '\n' || this == '\u000C' || this == '\r'
 
     private fun writePendingNewLines(resetNewLineCount: Int) {
         pendingNewLineCount.let { newLineCount ->
